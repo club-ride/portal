@@ -17,430 +17,132 @@
     --success: #8DAA43;
     --section-bg: #FFFFFF;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
   /* Header */
   .header {
-    background: var(--ink);
-    color: var(--white);
-    padding: 28px 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: var(--ink); color: var(--white);
+    padding: 16px 48px; display: flex; align-items: center;
+    justify-content: space-between; position: sticky; top: 0; z-index: 100;
   }
   .header-left { display: flex; align-items: center; gap: 16px; }
-  .logo {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    color: var(--white);
-  }
-  .logo span { color: var(--accent); }
+  .header-logo { height: 40px; width: auto; display: block; }
   .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
   .header-title { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; text-transform: uppercase; }
   .header-actions { display: flex; gap: 12px; }
-  .btn {
-    padding: 9px 20px;
-    border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-  }
+  .btn { padding: 9px 20px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
   .btn-ghost { background: rgba(255,255,255,0.1); color: var(--white); }
   .btn-ghost:hover { background: rgba(255,255,255,0.18); }
   .btn-primary { background: var(--accent); color: var(--white); }
   .btn-primary:hover { background: #17336a; }
 
+  /* Resubmit banner */
+  .resubmit-banner {
+    display: none; background: #FDF4E3; border-bottom: 1px solid #C8860A;
+    padding: 12px 48px; font-size: 13px; color: #7a5000;
+    align-items: center; gap: 10px;
+  }
+  .resubmit-banner.show { display: flex; }
+  .resubmit-banner strong { font-weight: 600; }
+
   /* Layout */
   .layout { display: flex; min-height: calc(100vh - 73px); }
 
-  /* Sidebar nav */
-  .sidebar {
-    width: 240px;
-    flex-shrink: 0;
-    background: var(--white);
-    border-right: 1px solid var(--border);
-    padding: 32px 0;
-    position: sticky;
-    top: 73px;
-    height: calc(100vh - 73px);
-    overflow-y: auto;
-  }
-  .sidebar-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    padding: 0 24px 12px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 24px;
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--ink-light);
-    cursor: pointer;
-    transition: all 0.12s;
-    border-left: 3px solid transparent;
-    text-decoration: none;
-  }
+  /* Sidebar */
+  .sidebar { width: 240px; flex-shrink: 0; background: var(--white); border-right: 1px solid var(--border); padding: 32px 0; position: sticky; top: 73px; height: calc(100vh - 73px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-light); padding: 0 24px 12px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; font-size: 13px; font-weight: 400; color: var(--ink-light); cursor: pointer; transition: all 0.12s; border-left: 3px solid transparent; text-decoration: none; }
   .nav-item:hover { background: var(--cream); color: var(--ink); }
   .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-light); font-weight: 500; }
-  .nav-number {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--border);
-    font-size: 10px;
-    font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    color: var(--ink-light);
-  }
+  .nav-number { width: 20px; height: 20px; border-radius: 50%; background: var(--border); font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ink-light); }
   .nav-item.active .nav-number { background: var(--accent); color: white; }
   .nav-item.complete .nav-number { background: var(--success); color: white; }
   .nav-item.complete { color: var(--ink); }
 
-  /* Main content */
+  /* Main */
   .main { flex: 1; padding: 48px; max-width: 860px; }
 
   /* Section cards */
-  .section-card {
-    background: var(--section-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 36px 40px;
-    margin-bottom: 24px;
-    display: none;
-    animation: fadeUp 0.25s ease;
-  }
+  .section-card { background: var(--section-bg); border: 1px solid var(--border); border-radius: 12px; padding: 36px 40px; margin-bottom: 24px; display: none; animation: fadeUp 0.25s ease; }
   .section-card.active { display: block; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .section-header { margin-bottom: 28px; }
-  .section-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-  .section-title {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--ink);
-    line-height: 1.2;
-  }
+  .section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .section-title { font-family: 'DM Sans', sans-serif; font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.2; }
   .section-desc { font-size: 13px; color: var(--ink-light); margin-top: 8px; line-height: 1.6; }
 
   /* Form elements */
   .field-group { margin-bottom: 20px; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
   .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink);
-    letter-spacing: 0.3px;
-    margin-bottom: 6px;
-  }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.3px; margin-bottom: 6px; }
   label .optional { font-weight: 400; color: var(--ink-light); }
-
-  input[type="text"], input[type="date"], input[type="time"], input[type="email"],
-  select, textarea {
-    width: 100%;
-    padding: 10px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    -webkit-appearance: none;
+  input[type="text"], input[type="date"], input[type="time"], input[type="email"], select, textarea {
+    width: 100%; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--ink); background: var(--cream); border: 1px solid var(--border);
+    border-radius: 8px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none;
   }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(200, 82, 26, 0.1);
-    background: var(--white);
-  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31,65,127,0.1); background: var(--white); }
   textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
   select { cursor: pointer; }
 
-  /* Tag input */
-  .tag-input-wrap {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: 44px;
-    cursor: text;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .tag-input-wrap:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(200, 82, 26, 0.1);
-    background: var(--white);
-  }
-  .tag {
-    background: var(--ink);
-    color: var(--white);
-    border-radius: 4px;
-    padding: 3px 8px;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .tag button { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
-  .tag button:hover { color: white; }
-  .tag-input {
-    border: none !important;
-    background: transparent !important;
-    outline: none;
-    font-size: 13px;
-    color: var(--ink);
-    min-width: 120px;
-    flex: 1;
-    padding: 3px 4px !important;
-    box-shadow: none !important;
-  }
-
-  /* Dynamic rows */
+  /* Dynamic tables */
   .dynamic-table { width: 100%; border-collapse: collapse; }
-  .dynamic-table th {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    padding: 0 10px 10px 0;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
+  .dynamic-table th { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-light); padding: 0 10px 10px 0; text-align: left; border-bottom: 1px solid var(--border); }
   .dynamic-table td { padding: 8px 8px 8px 0; vertical-align: top; }
   .dynamic-table td:last-child { width: 40px; text-align: center; padding-right: 0; }
-  .dynamic-table input, .dynamic-table select, .dynamic-table textarea {
-    margin: 0;
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-  .row-delete {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    width: 30px; height: 30px;
-    cursor: pointer;
-    color: var(--ink-light);
-    font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.12s;
-    flex-shrink: 0;
-  }
+  .dynamic-table input, .dynamic-table select, .dynamic-table textarea { margin: 0; font-size: 13px; padding: 8px 10px; }
+  .row-delete { background: none; border: 1px solid var(--border); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; color: var(--ink-light); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
   .row-delete:hover { border-color: #e55; color: #e55; background: #fff0f0; }
-  .add-row-btn {
-    margin-top: 12px;
-    background: none;
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 9px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: var(--ink-light);
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.12s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
+  .add-row-btn { margin-top: 12px; background: none; border: 1px dashed var(--border); border-radius: 8px; padding: 9px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-light); cursor: pointer; width: 100%; transition: all 0.12s; display: flex; align-items: center; justify-content: center; gap: 6px; }
   .add-row-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
-  /* Checkbox grid */
+  /* Checkboxes */
   .checkbox-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.12s;
-    font-size: 13px;
-  }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.12s; font-size: 13px; }
   .checkbox-item:hover { border-color: var(--accent); background: var(--accent-light); }
   .checkbox-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); }
   .checkbox-item.checked { border-color: var(--accent); background: var(--accent-light); }
 
-  /* File upload */
-  .file-upload {
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    padding: 32px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: var(--cream);
-  }
-  .file-upload:hover { border-color: var(--accent); background: var(--accent-light); }
-  .file-upload-icon { font-size: 32px; margin-bottom: 10px; }
-  .file-upload-text { font-size: 14px; font-weight: 500; color: var(--ink); }
-  .file-upload-sub { font-size: 12px; color: var(--ink-light); margin-top: 4px; }
-  .file-upload input { display: none; }
-  .file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
-  .file-item {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-    padding: 8px 12px; font-size: 13px;
-  }
-  .file-item-name { display: flex; align-items: center; gap: 8px; }
-  .file-icon { font-size: 16px; }
-
   /* Phase headers */
-  .phase-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 14px;
-    letter-spacing: 0.2px;
-  }
-  .phase-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  .phase-header { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 14px; letter-spacing: 0.2px; }
+  .phase-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
   /* Inline file upload */
-  .inline-upload-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 7px 12px;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--ink-light);
-    cursor: pointer;
-    transition: all 0.12s;
-    white-space: nowrap;
-  }
+  .inline-upload-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; background: var(--cream); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--ink-light); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
   .inline-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-  .inline-file-name {
-    display: block;
-    font-size: 11px;
-    color: var(--success);
-    margin-top: 4px;
-    word-break: break-all;
-    max-width: 180px;
-  }
+  .inline-file-name { display: block; font-size: 11px; color: var(--success); margin-top: 4px; word-break: break-all; max-width: 180px; }
 
   /* Divider */
   .divider { height: 1px; background: var(--border); margin: 28px 0; }
 
-  /* Navigation buttons */
-  .section-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
-  .btn-nav {
-    padding: 11px 28px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-  }
+  /* Nav buttons */
+  .section-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .btn-nav { padding: 11px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
   .btn-back { background: var(--cream); color: var(--ink); border: 1px solid var(--border); }
   .btn-back:hover { background: var(--border); }
   .btn-next { background: var(--accent); color: var(--white); }
-  .btn-next:hover { background: #B34515; }
+  .btn-next:hover { background: #17336a; }
   .btn-submit { background: var(--ink); color: var(--white); }
   .btn-submit:hover { background: #333; }
 
-  /* Review screen */
-  .review-section { margin-bottom: 28px; }
-  .review-section-title {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 14px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .review-edit-btn {
-    font-size: 12px; color: var(--accent); cursor: pointer; font-family: 'DM Sans', sans-serif;
-    font-weight: 500; background: none; border: none; padding: 0;
-  }
-  .review-field { margin-bottom: 10px; }
-  .review-field-label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 2px; }
-  .review-field-value { font-size: 14px; color: var(--ink); line-height: 1.5; }
-
   /* Success */
-  .success-screen {
-    display: none;
-    text-align: center;
-    padding: 80px 40px;
-  }
+  .success-screen { display: none; text-align: center; padding: 80px 40px; }
   .success-icon { font-size: 56px; margin-bottom: 20px; }
-  .success-title { font-family: 'DM Sans', sans-serif; font-size: 36px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+  .success-title { font-size: 32px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
   .success-sub { font-size: 15px; color: var(--ink-light); line-height: 1.6; max-width: 420px; margin: 0 auto 32px; }
-  .success-link-box {
-    background: var(--cream); border: 1px solid var(--border); border-radius: 10px;
-    padding: 16px 20px; display: inline-flex; align-items: center; gap: 12px;
-    font-size: 13px; color: var(--ink); max-width: 500px; width: 100%;
-  }
+  .success-link-box { background: var(--cream); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: inline-flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink); max-width: 560px; width: 100%; }
   .success-link { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--accent); }
   .copy-btn { flex-shrink: 0; background: var(--ink); color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* Responsive */
   @media (max-width: 900px) {
     .sidebar { display: none; }
     .main { padding: 24px; }
     .field-row, .field-row-3 { grid-template-columns: 1fr; }
     .checkbox-grid { grid-template-columns: 1fr 1fr; }
-    .header { padding: 20px 24px; }
+    .header { padding: 14px 20px; }
+    .resubmit-banner { padding: 12px 20px; }
   }
 </style>
 </head>
@@ -448,9 +150,9 @@
 
 <header class="header">
   <div class="header-left">
-    <div class="logo">Club<span>Ride</span></div>
+    <img src="assets/RTC_Club_Ride_LG_WHT.png" alt="Club Ride" class="header-logo">
     <div class="header-divider"></div>
-    <div class="header-title">Communications Plan Submission</div>
+    <div class="header-title">Communications Plan</div>
   </div>
   <div class="header-actions">
     <button class="btn btn-ghost" onclick="saveDraft()">Save Draft</button>
@@ -458,53 +160,32 @@
   </div>
 </header>
 
-<div class="layout">
+<!-- Resubmit banner (shown when editing after revisions) -->
+<div class="resubmit-banner" id="resubmit-banner">
+  <span>↩</span>
+  <span><strong>Resubmission mode:</strong> This plan was returned for revisions. Update the sections below and resubmit when ready.</span>
+</div>
 
-  <!-- Sidebar -->
+<div class="layout">
   <nav class="sidebar">
     <div class="sidebar-label">Sections</div>
-    <a class="nav-item active" onclick="goToSection(1)" id="nav-1">
-      <span class="nav-number">1</span> Overview
-    </a>
-    <a class="nav-item" onclick="goToSection(2)" id="nav-2">
-      <span class="nav-number">2</span> Key Event Details
-    </a>
-    <a class="nav-item" onclick="goToSection(3)" id="nav-3">
-      <span class="nav-number">3</span> Roles & Responsibilities
-    </a>
-    <a class="nav-item" onclick="goToSection(4)" id="nav-4">
-      <span class="nav-number">4</span> Objectives
-    </a>
-    <a class="nav-item" onclick="goToSection(5)" id="nav-5">
-      <span class="nav-number">5</span> Goals
-    </a>
-    <a class="nav-item" onclick="goToSection(6)" id="nav-6">
-      <span class="nav-number">6</span> Target Audience
-    </a>
-    <a class="nav-item" onclick="goToSection(7)" id="nav-7">
-      <span class="nav-number">7</span> Marketing Strategy
-    </a>
-    <a class="nav-item" onclick="goToSection(8)" id="nav-8">
-      <span class="nav-number">8</span> Tactics
-    </a>
-    <a class="nav-item" onclick="goToSection(9)" id="nav-9">
-      <span class="nav-number">9</span> Creative Specs
-    </a>
-    <a class="nav-item" onclick="goToSection(10)" id="nav-10">
-      <span class="nav-number">10</span> Attachments
-    </a>
-    <a class="nav-item" onclick="goToSection(11)" id="nav-11">
-      <span class="nav-number">11</span> Workback Calendar
-    </a>
-    <a class="nav-item" onclick="goToSection(12)" id="nav-12">
-      <span class="nav-number">12</span> Comms Calendar
-    </a>
+    <a class="nav-item active" onclick="goToSection(1)" id="nav-1"><span class="nav-number">1</span> Overview</a>
+    <a class="nav-item" onclick="goToSection(2)" id="nav-2"><span class="nav-number">2</span> Key Event Details</a>
+    <a class="nav-item" onclick="goToSection(3)" id="nav-3"><span class="nav-number">3</span> Roles & Responsibilities</a>
+    <a class="nav-item" onclick="goToSection(4)" id="nav-4"><span class="nav-number">4</span> Objectives</a>
+    <a class="nav-item" onclick="goToSection(5)" id="nav-5"><span class="nav-number">5</span> Goals</a>
+    <a class="nav-item" onclick="goToSection(6)" id="nav-6"><span class="nav-number">6</span> Target Audience</a>
+    <a class="nav-item" onclick="goToSection(7)" id="nav-7"><span class="nav-number">7</span> Marketing Strategy</a>
+    <a class="nav-item" onclick="goToSection(8)" id="nav-8"><span class="nav-number">8</span> Tactics</a>
+    <a class="nav-item" onclick="goToSection(9)" id="nav-9"><span class="nav-number">9</span> Creative Specs</a>
+    <a class="nav-item" onclick="goToSection(10)" id="nav-10"><span class="nav-number">10</span> Attachments</a>
+    <a class="nav-item" onclick="goToSection(11)" id="nav-11"><span class="nav-number">11</span> Workback Calendar</a>
+    <a class="nav-item" onclick="goToSection(12)" id="nav-12"><span class="nav-number">12</span> Comms Calendar</a>
   </nav>
 
-  <!-- Main -->
   <main class="main">
 
-    <!-- SECTION 1: Overview -->
+    <!-- SECTION 1 -->
     <div class="section-card active" id="section-1">
       <div class="section-header">
         <div class="section-eyebrow">Section 1</div>
@@ -535,7 +216,7 @@
       </div>
     </div>
 
-    <!-- SECTION 2: Key Event Details -->
+    <!-- SECTION 2 -->
     <div class="section-card" id="section-2">
       <div class="section-header">
         <div class="section-eyebrow">Section 2</div>
@@ -543,24 +224,12 @@
         <div class="section-desc">Provide the core logistics for this event.</div>
       </div>
       <div class="field-row">
-        <div>
-          <label>Event Date</label>
-          <input type="date" id="event-date">
-        </div>
-        <div>
-          <label>Event Day <span class="optional">(auto-fills)</span></label>
-          <input type="text" id="event-day" placeholder="e.g. Saturday" readonly style="background:#eee">
-        </div>
+        <div><label>Event Date</label><input type="date" id="event-date"></div>
+        <div><label>Event Day <span class="optional">(auto-fills)</span></label><input type="text" id="event-day" placeholder="e.g. Saturday" readonly style="background:#eee"></div>
       </div>
       <div class="field-row">
-        <div>
-          <label>Start Time</label>
-          <input type="time" id="event-start">
-        </div>
-        <div>
-          <label>End Time <span class="optional">(approx.)</span></label>
-          <input type="time" id="event-end">
-        </div>
+        <div><label>Start Time</label><input type="time" id="event-start"></div>
+        <div><label>End Time <span class="optional">(approx.)</span></label><input type="time" id="event-end"></div>
       </div>
       <div class="field-group">
         <label>Location / Venue</label>
@@ -576,25 +245,16 @@
       </div>
     </div>
 
-    <!-- SECTION 3: Roles & Responsibilities -->
+    <!-- SECTION 3 -->
     <div class="section-card" id="section-3">
       <div class="section-header">
         <div class="section-eyebrow">Section 3</div>
         <div class="section-title">Roles & Responsibilities</div>
         <div class="section-desc">List all team members and partners involved, along with their roles.</div>
       </div>
-
       <label style="margin-bottom:12px; display:block;">Team Members & Partners</label>
-      <table class="dynamic-table" id="roles-table">
-        <thead>
-          <tr>
-            <th style="width:20%">Name</th>
-            <th style="width:20%">Role / Title</th>
-            <th style="width:20%">Team / Org</th>
-            <th>Responsibilities</th>
-            <th></th>
-          </tr>
-        </thead>
+      <table class="dynamic-table">
+        <thead><tr><th style="width:20%">Name</th><th style="width:20%">Role / Title</th><th style="width:20%">Team / Org</th><th>Responsibilities</th><th></th></tr></thead>
         <tbody id="roles-cr-body">
           <tr>
             <td><input type="text" placeholder="Name"></td>
@@ -606,14 +266,13 @@
         </tbody>
       </table>
       <button class="add-row-btn" onclick="addRow('roles-cr-body', rolesRowTemplate)">+ Add team member or partner</button>
-
       <div class="section-footer">
         <button class="btn-nav btn-back" onclick="prevSection(3)">← Back</button>
         <button class="btn-nav btn-next" onclick="nextSection(3)">Next: Objectives →</button>
       </div>
     </div>
 
-    <!-- SECTION 4: Objectives -->
+    <!-- SECTION 4 -->
     <div class="section-card" id="section-4">
       <div class="section-header">
         <div class="section-eyebrow">Section 4</div>
@@ -621,7 +280,7 @@
         <div class="section-desc">List the qualitative outcomes this event or campaign is designed to achieve.</div>
       </div>
       <div id="objectives-list">
-        <div class="field-row" style="grid-template-columns: 1fr 40px; margin-bottom:10px;" id="obj-row-0">
+        <div style="display:grid; grid-template-columns: 1fr 40px; gap:8px; margin-bottom:8px;" id="obj-row-0">
           <input type="text" placeholder="e.g. Educate participants on the history of women's mobility in Nevada">
           <button class="row-delete" onclick="deleteObjectiveRow(this)">×</button>
         </div>
@@ -633,7 +292,7 @@
       </div>
     </div>
 
-    <!-- SECTION 5: Goals -->
+    <!-- SECTION 5 -->
     <div class="section-card" id="section-5">
       <div class="section-header">
         <div class="section-eyebrow">Section 5</div>
@@ -641,22 +300,11 @@
         <div class="section-desc">List specific, measurable targets for this event or campaign.</div>
       </div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Goal Description</th>
-            <th style="width:160px">Target / Metric</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Goal Description</th><th style="width:160px">Target / Metric</th><th></th></tr></thead>
         <tbody id="goals-body">
           <tr>
             <td><input type="text" placeholder="e.g. Registered participants"></td>
             <td><input type="text" placeholder="e.g. 30"></td>
-            <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
-          </tr>
-          <tr>
-            <td><input type="text" placeholder="e.g. Riders tracking trip in app"></td>
-            <td><input type="text" placeholder="e.g. 60%"></td>
             <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
           </tr>
         </tbody>
@@ -668,7 +316,7 @@
       </div>
     </div>
 
-    <!-- SECTION 6: Target Audience -->
+    <!-- SECTION 6 -->
     <div class="section-card" id="section-6">
       <div class="section-header">
         <div class="section-eyebrow">Section 6</div>
@@ -697,7 +345,7 @@
       </div>
     </div>
 
-    <!-- SECTION 7: Marketing Strategy -->
+    <!-- SECTION 7 -->
     <div class="section-card" id="section-7">
       <div class="section-header">
         <div class="section-eyebrow">Section 7</div>
@@ -725,7 +373,7 @@
       </div>
     </div>
 
-    <!-- SECTION 8: Tactics -->
+    <!-- SECTION 8 -->
     <div class="section-card" id="section-8">
       <div class="section-header">
         <div class="section-eyebrow">Section 8</div>
@@ -760,7 +408,7 @@
       </div>
     </div>
 
-    <!-- SECTION 9: Creative Specs -->
+    <!-- SECTION 9 -->
     <div class="section-card" id="section-9">
       <div class="section-header">
         <div class="section-eyebrow">Section 9</div>
@@ -768,47 +416,12 @@
         <div class="section-desc">List the creative assets needed and their specifications.</div>
       </div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Asset Type</th>
-            <th style="width:180px">Dimensions / Specs</th>
-            <th style="width:130px">Format</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Asset Type</th><th style="width:180px">Dimensions / Specs</th><th style="width:130px">Format</th><th></th></tr></thead>
         <tbody id="specs-body">
           <tr>
             <td><input type="text" placeholder="e.g. Landing Page Hero"></td>
             <td><input type="text" placeholder="e.g. 1600 × 600 px"></td>
-            <td>
-              <select>
-                <option value="">Format</option>
-                <option>JPG</option>
-                <option>PNG</option>
-                <option>SVG</option>
-                <option>PDF</option>
-                <option>GIF</option>
-                <option>MP4</option>
-                <option>Other</option>
-              </select>
-            </td>
-            <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
-          </tr>
-          <tr>
-            <td><input type="text" placeholder="e.g. Social Media (IG/FB)"></td>
-            <td><input type="text" placeholder="e.g. 1080 × 1350 px"></td>
-            <td>
-              <select>
-                <option value="">Format</option>
-                <option>JPG</option>
-                <option>PNG</option>
-                <option>SVG</option>
-                <option>PDF</option>
-                <option>GIF</option>
-                <option>MP4</option>
-                <option>Other</option>
-              </select>
-            </td>
+            <td><select><option value="">Format</option><option>JPG</option><option>PNG</option><option>SVG</option><option>PDF</option><option>GIF</option><option>MP4</option><option>Other</option></select></td>
             <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
           </tr>
         </tbody>
@@ -816,11 +429,11 @@
       <button class="add-row-btn" onclick="addRow('specs-body', specsRowTemplate)">+ Add creative asset</button>
       <div class="section-footer">
         <button class="btn-nav btn-back" onclick="prevSection(9)">← Back</button>
-        <button class="btn-nav btn-next" onclick="nextSection(9)">Next: Creative Attachments →</button>
+        <button class="btn-nav btn-next" onclick="nextSection(9)">Next: Attachments →</button>
       </div>
     </div>
 
-    <!-- SECTION 10: Attachments -->
+    <!-- SECTION 10 -->
     <div class="section-card" id="section-10">
       <div class="section-header">
         <div class="section-eyebrow">Section 10</div>
@@ -828,31 +441,11 @@
         <div class="section-desc">List any creative assets, mockups, or reference files included with this plan.</div>
       </div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Asset Name</th>
-            <th style="width:25%">Asset Type</th>
-            <th style="width:200px">File Upload</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Asset Name</th><th style="width:25%">Asset Type</th><th style="width:200px">File Upload</th><th></th></tr></thead>
         <tbody id="attachments-body">
           <tr>
             <td><input type="text" placeholder="e.g. WHM Landing Page Hero v1"></td>
-            <td>
-              <select>
-                <option value="">Type</option>
-                <option>Mockup</option>
-                <option>Logo</option>
-                <option>Photography</option>
-                <option>Video</option>
-                <option>Copy / Script</option>
-                <option>Flyer / Print</option>
-                <option>Presentation</option>
-                <option>Spreadsheet</option>
-                <option>Other</option>
-              </select>
-            </td>
+            <td><select><option value="">Type</option><option>Mockup</option><option>Logo</option><option>Photography</option><option>Video</option><option>Copy / Script</option><option>Flyer / Print</option><option>Presentation</option><option>Spreadsheet</option><option>Other</option></select></td>
             <td><label class="inline-upload-btn">📎 Choose file<input type="file" style="display:none" onchange="showInlineFile(this)"></label><span class="inline-file-name"></span></td>
             <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
           </tr>
@@ -861,7 +454,7 @@
       <button class="add-row-btn" onclick="addRow('attachments-body', attachmentsRowTemplate)">+ Add attachment</button>
       <div class="field-group" style="margin-top:20px;">
         <label>Notes on Attachments <span class="optional">(optional)</span></label>
-        <textarea id="attachment-notes" rows="3" placeholder="Any context about the files listed, what stage they're at, or what feedback is needed..."></textarea>
+        <textarea id="attachment-notes" rows="3" placeholder="Any context about the files listed..."></textarea>
       </div>
       <div class="section-footer">
         <button class="btn-nav btn-back" onclick="prevSection(10)">← Back</button>
@@ -869,7 +462,7 @@
       </div>
     </div>
 
-    <!-- SECTION 11: Workback Calendar -->
+    <!-- SECTION 11 -->
     <div class="section-card" id="section-11">
       <div class="section-header">
         <div class="section-eyebrow">Section 11</div>
@@ -877,21 +470,9 @@
         <div class="section-desc">List key tasks by phase — approval, execution, and post-event.</div>
       </div>
 
-      <!-- Phase 1: Approval -->
-      <div class="phase-header">
-        <div class="phase-dot" style="background:#1F417F"></div>
-        <span>Phase 1 — Approval</span>
-      </div>
+      <div class="phase-header"><div class="phase-dot" style="background:#1F417F"></div>Phase 1 — Approval</div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Task / Item</th>
-            <th style="width:130px">Deadline</th>
-            <th style="width:130px">Owner</th>
-            <th style="width:120px">Status</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Task / Item</th><th style="width:130px">Deadline</th><th style="width:130px">Owner</th><th style="width:120px">Status</th><th></th></tr></thead>
         <tbody id="workback-approval-body">
           <tr>
             <td><input type="text" placeholder="Task description"></td>
@@ -906,21 +487,9 @@
 
       <div class="divider"></div>
 
-      <!-- Phase 2: Execution -->
-      <div class="phase-header">
-        <div class="phase-dot" style="background:#8DAA43"></div>
-        <span>Phase 2 — Execution</span>
-      </div>
+      <div class="phase-header"><div class="phase-dot" style="background:#8DAA43"></div>Phase 2 — Execution</div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Task / Item</th>
-            <th style="width:130px">Deadline</th>
-            <th style="width:130px">Owner</th>
-            <th style="width:120px">Status</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Task / Item</th><th style="width:130px">Deadline</th><th style="width:130px">Owner</th><th style="width:120px">Status</th><th></th></tr></thead>
         <tbody id="workback-execution-body">
           <tr>
             <td><input type="text" placeholder="Task description"></td>
@@ -935,21 +504,9 @@
 
       <div class="divider"></div>
 
-      <!-- Phase 3: Post-Event -->
-      <div class="phase-header">
-        <div class="phase-dot" style="background:#5A5A56"></div>
-        <span>Phase 3 — Post-Event</span>
-      </div>
+      <div class="phase-header"><div class="phase-dot" style="background:#5A5A56"></div>Phase 3 — Post-Event</div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th>Task / Item</th>
-            <th style="width:130px">Deadline</th>
-            <th style="width:130px">Owner</th>
-            <th style="width:120px">Status</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th>Task / Item</th><th style="width:130px">Deadline</th><th style="width:130px">Owner</th><th style="width:120px">Status</th><th></th></tr></thead>
         <tbody id="workback-postevent-body">
           <tr>
             <td><input type="text" placeholder="Task description"></td>
@@ -968,7 +525,7 @@
       </div>
     </div>
 
-    <!-- SECTION 12: Communications Calendar -->
+    <!-- SECTION 12 -->
     <div class="section-card" id="section-12">
       <div class="section-header">
         <div class="section-eyebrow">Section 12</div>
@@ -976,35 +533,11 @@
         <div class="section-desc">Map out the planned publish dates, channels, content details, and owners.</div>
       </div>
       <table class="dynamic-table">
-        <thead>
-          <tr>
-            <th style="width:120px">Publish Date</th>
-            <th style="width:160px">Channel</th>
-            <th>Content Detail</th>
-            <th style="width:110px">Owner</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead><tr><th style="width:120px">Publish Date</th><th style="width:160px">Channel</th><th>Content Detail</th><th style="width:110px">Owner</th><th></th></tr></thead>
         <tbody id="comms-body">
           <tr>
             <td><input type="date"></td>
-            <td>
-              <select>
-                <option value="">Channel</option>
-                <option>Web / Blog</option>
-                <option>Instagram</option>
-                <option>Facebook</option>
-                <option>LinkedIn</option>
-                <option>YouTube</option>
-                <option>Email / Eblast</option>
-                <option>In-App</option>
-                <option>BTC / SSTT</option>
-                <option>Wi-Fi Signage</option>
-                <option>Newsletter</option>
-                <option>Blink Post</option>
-                <option>Other</option>
-              </select>
-            </td>
+            <td><select><option value="">Channel</option><option>Web / Blog</option><option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>YouTube</option><option>Email / Eblast</option><option>In-App</option><option>BTC / SSTT</option><option>Wi-Fi Signage</option><option>Newsletter</option><option>Blink Post</option><option>Other</option></select></td>
             <td><input type="text" placeholder="Brief description of content"></td>
             <td><input type="text" placeholder="Owner"></td>
             <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
@@ -1014,17 +547,17 @@
       <button class="add-row-btn" onclick="addRow('comms-body', commsRowTemplate)">+ Add content item</button>
       <div class="section-footer">
         <button class="btn-nav btn-back" onclick="prevSection(12)">← Back</button>
-        <button class="btn-nav btn-submit" onclick="submitPlan()">Submit for Review →</button>
+        <button class="btn-nav btn-submit" id="submit-btn" onclick="submitPlan()">Submit for Review →</button>
       </div>
     </div>
 
-    <!-- Success Screen -->
+    <!-- Success -->
     <div class="success-screen" id="success-screen">
       <div class="success-icon">✅</div>
-      <div class="success-title">Plan Submitted!</div>
-      <div class="success-sub">Your communications plan has been submitted for internal review. Share the link below with your reviewer when ready.</div>
+      <div class="success-title" id="success-title">Plan Submitted!</div>
+      <div class="success-sub" id="success-sub">Your communications plan has been submitted for review. Share the link below with your reviewer when ready.</div>
       <div class="success-link-box">
-        <span class="success-link" id="share-link">https://clubride.app/review/WHM-2026-commsplan</span>
+        <span class="success-link" id="share-link"></span>
         <button class="copy-btn" onclick="copyLink()">Copy</button>
       </div>
       <p style="font-size:12px; color:var(--ink-light); margin-top:16px;">The reviewer can open this link directly from email — no login required.</p>
@@ -1035,15 +568,173 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ── Supabase config ──────────────────────────────────────────────
-  const SUPABASE_URL = 'https://bcvwfthrqfzmfwzauhrl.supabase.co';
+  const SUPABASE_URL  = 'https://bcvwfthrqfzmfwzauhrl.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjdndmdGhycWZ6bWZ3emF1aHJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDE2MDMsImV4cCI6MjA4NzExNzYwM30.kC0SQw_6fev9V-KgJfuYaUdHrrlDUc7CLRfEPXig0eo';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  // ── Navigation ───────────────────────────────────────────────────
   let currentSection = 1;
   const totalSections = 12;
+  let editingSubmissionId = null; // set when resubmitting
+  let existingActivityLog = [];
 
+  // ── Check if resubmit mode ───────────────────────────────────────
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const resubmitId = params.get('resubmit');
+    if (resubmitId) {
+      editingSubmissionId = resubmitId;
+      document.getElementById('resubmit-banner').classList.add('show');
+      document.getElementById('submit-btn').textContent = 'Resubmit for Review →';
+      await prefillForm(resubmitId);
+    }
+  }
+
+  async function prefillForm(id) {
+    const { data, error } = await sb.from('submissions').select('*').eq('id', id).single();
+    if (error || !data) return;
+    existingActivityLog = data.activity_log || [];
+    const fd = data.form_data || {};
+    const ov = fd.overview || {};
+    const ev = fd.event_details || {};
+    const ma = fd.marketing_strategy || {};
+    const ta = fd.target_audience || {};
+    const tc = fd.tactics || {};
+
+    // Section 1
+    if (ov.event_name) document.getElementById('event-name').value = ov.event_name;
+    if (ov.short_name) document.getElementById('event-short-name').value = ov.short_name;
+    if (ov.overview) document.getElementById('overview').value = ov.overview;
+    if (ov.theme) document.getElementById('theme').value = ov.theme;
+
+    // Section 2
+    if (ev.date) { document.getElementById('event-date').value = ev.date; document.getElementById('event-date').dispatchEvent(new Event('change')); }
+    if (ev.start_time) document.getElementById('event-start').value = ev.start_time;
+    if (ev.end_time) document.getElementById('event-end').value = ev.end_time;
+    if (ev.location) document.getElementById('event-location').value = ev.location;
+    if (ev.notes) document.getElementById('event-notes').value = ev.notes;
+
+    // Section 3 — roles
+    if (fd.roles && fd.roles.length) {
+      const tbody = document.getElementById('roles-cr-body');
+      tbody.innerHTML = '';
+      fd.roles.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `<tr>
+          <td><input type="text" value="${r[0]||''}"></td>
+          <td><input type="text" value="${r[1]||''}"></td>
+          <td><input type="text" value="${r[2]||''}"></td>
+          <td><input type="text" value="${r[3]||''}"></td>
+          <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
+        </tr>`);
+      });
+    }
+
+    // Section 4 — objectives
+    if (fd.objectives && fd.objectives.length) {
+      const list = document.getElementById('objectives-list');
+      list.innerHTML = '';
+      fd.objectives.forEach((o, i) => {
+        list.insertAdjacentHTML('beforeend', `<div style="display:grid;grid-template-columns:1fr 40px;gap:8px;margin-bottom:8px;" id="obj-row-${i}">
+          <input type="text" value="${o}">
+          <button class="row-delete" onclick="deleteObjectiveRow(this)">×</button>
+        </div>`);
+      });
+    }
+
+    // Section 5 — goals
+    if (fd.goals && fd.goals.length) {
+      const tbody = document.getElementById('goals-body');
+      tbody.innerHTML = '';
+      fd.goals.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `<tr>
+          <td><input type="text" value="${r[0]||''}"></td>
+          <td><input type="text" value="${r[1]||''}"></td>
+          <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
+        </tr>`);
+      });
+    }
+
+    // Section 6 — audience
+    if (ta.segments) {
+      document.querySelectorAll('#audience-grid input[type="checkbox"]').forEach(cb => {
+        if (ta.segments.includes(cb.value)) { cb.checked = true; cb.closest('.checkbox-item').classList.add('checked'); }
+      });
+    }
+    if (ta.notes) document.getElementById('audience-notes').value = ta.notes;
+
+    // Section 7 — strategy
+    if (ma.key_messages && ma.key_messages.length) {
+      const list = document.getElementById('messages-list');
+      list.innerHTML = '';
+      ma.key_messages.forEach(m => {
+        list.insertAdjacentHTML('beforeend', `<div style="display:grid;grid-template-columns:1fr 40px;gap:8px;margin-bottom:8px;">
+          <textarea rows="2">${m}</textarea>
+          <div style="padding-top:8px;"><button class="row-delete" onclick="this.closest('div').parentElement.remove()">×</button></div>
+        </div>`);
+      });
+    }
+    if (ma.notes) document.getElementById('strategy-notes').value = ma.notes;
+
+    // Section 8 — tactics
+    if (tc.channels) {
+      document.querySelectorAll('#section-8 .checkbox-item input[type="checkbox"]').forEach(cb => {
+        const label = cb.closest('.checkbox-item').textContent.trim();
+        if (tc.channels.includes(label)) { cb.checked = true; cb.closest('.checkbox-item').classList.add('checked'); }
+      });
+    }
+    if (tc.notes) document.getElementById('tactics-notes').value = tc.notes;
+
+    // Section 9 — specs
+    if (fd.creative_specs && fd.creative_specs.length) {
+      const tbody = document.getElementById('specs-body');
+      tbody.innerHTML = '';
+      fd.creative_specs.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `<tr>
+          <td><input type="text" value="${r[0]||''}"></td>
+          <td><input type="text" value="${r[1]||''}"></td>
+          <td><select><option value="">Format</option><option${r[2]==='JPG'?' selected':''}>JPG</option><option${r[2]==='PNG'?' selected':''}>PNG</option><option${r[2]==='SVG'?' selected':''}>SVG</option><option${r[2]==='PDF'?' selected':''}>PDF</option><option${r[2]==='GIF'?' selected':''}>GIF</option><option${r[2]==='MP4'?' selected':''}>MP4</option><option${r[2]==='Other'?' selected':''}>Other</option></select></td>
+          <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
+        </tr>`);
+      });
+    }
+
+    // Section 11 — workback
+    const wb = fd.workback || {};
+    ['approval','execution','post_event'].forEach((phase, pi) => {
+      const bodyId = ['workback-approval-body','workback-execution-body','workback-postevent-body'][pi];
+      if (wb[phase] && wb[phase].length) {
+        const tbody = document.getElementById(bodyId);
+        tbody.innerHTML = '';
+        wb[phase].forEach(r => {
+          tbody.insertAdjacentHTML('beforeend', `<tr>
+            <td><input type="text" value="${r[0]||''}"></td>
+            <td><input type="date" value="${r[1]||''}"></td>
+            <td><input type="text" value="${r[2]||''}"></td>
+            <td><select><option value="">Status</option><option${r[3]==='Not Started'?' selected':''}>Not Started</option><option${r[3]==='In Progress'?' selected':''}>In Progress</option><option${r[3]==='Complete'?' selected':''}>Complete</option><option${r[3]==='Blocked'?' selected':''}>Blocked</option></select></td>
+            <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
+          </tr>`);
+        });
+      }
+    });
+
+    // Section 12 — comms
+    if (fd.comms_calendar && fd.comms_calendar.length) {
+      const tbody = document.getElementById('comms-body');
+      tbody.innerHTML = '';
+      const channels = ['Web / Blog','Instagram','Facebook','LinkedIn','YouTube','Email / Eblast','In-App','BTC / SSTT','Wi-Fi Signage','Newsletter','Blink Post','Other'];
+      fd.comms_calendar.forEach(r => {
+        const opts = channels.map(c => `<option${r[1]===c?' selected':''}>${c}</option>`).join('');
+        tbody.insertAdjacentHTML('beforeend', `<tr>
+          <td><input type="date" value="${r[0]||''}"></td>
+          <td><select><option value="">Channel</option>${opts}</select></td>
+          <td><input type="text" value="${r[2]||''}"></td>
+          <td><input type="text" value="${r[3]||''}"></td>
+          <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
+        </tr>`);
+      });
+    }
+  }
+
+  // ── Navigation ───────────────────────────────────────────────────
   function goToSection(n) {
     document.getElementById('section-' + currentSection).classList.remove('active');
     document.getElementById('nav-' + currentSection).classList.remove('active');
@@ -1054,16 +745,14 @@
     document.getElementById('nav-' + n).classList.remove('complete');
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
-
   function nextSection(n) { if (n < totalSections) goToSection(n + 1); }
   function prevSection(n) { if (n > 1) goToSection(n - 1); }
 
-  // ── Auto-fill day of week ────────────────────────────────────────
+  // ── Auto-fill day ────────────────────────────────────────────────
   document.getElementById('event-date').addEventListener('change', function() {
     if (this.value) {
       const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const d = new Date(this.value + 'T12:00:00');
-      document.getElementById('event-day').value = days[d.getDay()];
+      document.getElementById('event-day').value = days[new Date(this.value + 'T12:00:00').getDay()];
     }
   });
 
@@ -1076,7 +765,6 @@
     document.getElementById(tbodyId).insertAdjacentHTML('beforeend', templateFn());
   }
 
-  // ── Row templates ────────────────────────────────────────────────
   const rolesRowTemplate = () => `<tr>
     <td><input type="text" placeholder="Name"></td>
     <td><input type="text" placeholder="Role"></td>
@@ -1084,27 +772,23 @@
     <td><input type="text" placeholder="Responsibilities"></td>
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
-
   const goalsRowTemplate = () => `<tr>
     <td><input type="text" placeholder="Goal description"></td>
     <td><input type="text" placeholder="Target / Metric"></td>
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
-
   const attachmentsRowTemplate = () => `<tr>
     <td><input type="text" placeholder="e.g. WHM Landing Page Hero v1"></td>
     <td><select><option value="">Type</option><option>Mockup</option><option>Logo</option><option>Photography</option><option>Video</option><option>Copy / Script</option><option>Flyer / Print</option><option>Presentation</option><option>Spreadsheet</option><option>Other</option></select></td>
     <td><label class="inline-upload-btn">📎 Choose file<input type="file" style="display:none" onchange="showInlineFile(this)"></label><span class="inline-file-name"></span></td>
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
-
   const specsRowTemplate = () => `<tr>
     <td><input type="text" placeholder="e.g. Eblast Header"></td>
     <td><input type="text" placeholder="e.g. 800px wide"></td>
     <td><select><option value="">Format</option><option>JPG</option><option>PNG</option><option>SVG</option><option>PDF</option><option>GIF</option><option>MP4</option><option>Other</option></select></td>
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
-
   const workbackRowTemplate = () => `<tr>
     <td><input type="text" placeholder="Task description"></td>
     <td><input type="date"></td>
@@ -1112,7 +796,6 @@
     <td><select><option value="">Status</option><option>Not Started</option><option>In Progress</option><option>Complete</option><option>Blocked</option></select></td>
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
-
   const commsRowTemplate = () => `<tr>
     <td><input type="date"></td>
     <td><select><option value="">Channel</option><option>Web / Blog</option><option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>YouTube</option><option>Email / Eblast</option><option>In-App</option><option>BTC / SSTT</option><option>Wi-Fi Signage</option><option>Newsletter</option><option>Blink Post</option><option>Other</option></select></td>
@@ -1121,12 +804,11 @@
     <td><button class="row-delete" onclick="deleteRow(this)">×</button></td>
   </tr>`;
 
-  // ── Objectives ───────────────────────────────────────────────────
   let objCount = 1;
   function addObjectiveRow() {
     const id = 'obj-row-' + objCount++;
     document.getElementById('objectives-list').insertAdjacentHTML('beforeend',
-      `<div style="display:grid; grid-template-columns: 1fr 40px; gap:8px; margin-bottom:8px;" id="${id}">
+      `<div style="display:grid;grid-template-columns:1fr 40px;gap:8px;margin-bottom:8px;" id="${id}">
         <input type="text" placeholder="Objective...">
         <button class="row-delete" onclick="deleteObjectiveRow(this)">×</button>
       </div>`);
@@ -1135,44 +817,30 @@
     const row = btn.closest('div[id]');
     if (document.getElementById('objectives-list').children.length > 1) row.remove();
   }
-
-  // ── Key messages ─────────────────────────────────────────────────
   function addMessageRow() {
     document.getElementById('messages-list').insertAdjacentHTML('beforeend',
-      `<div style="display:grid; grid-template-columns: 1fr 40px; gap:8px; margin-bottom:8px;">
+      `<div style="display:grid;grid-template-columns:1fr 40px;gap:8px;margin-bottom:8px;">
         <textarea rows="2" placeholder="Key message..."></textarea>
         <div style="padding-top:8px;"><button class="row-delete" onclick="this.closest('div').parentElement.remove()">×</button></div>
       </div>`);
   }
-
-  // ── Inline file display ──────────────────────────────────────────
   function showInlineFile(input) {
     const span = input.closest('td').querySelector('.inline-file-name');
     if (input.files && input.files[0]) span.textContent = '✓ ' + input.files[0].name;
   }
-
-  // ── Checkbox toggle ──────────────────────────────────────────────
   document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', function() {
       this.closest('.checkbox-item').classList.toggle('checked', this.checked);
     });
   });
 
-  // ── Collect all form data into a JSON object ─────────────────────
+  // ── Collect form data ────────────────────────────────────────────
   function collectFormData() {
     const tableRows = (tbodyId) => Array.from(document.getElementById(tbodyId)?.rows || []).map(r =>
-      Array.from(r.cells).slice(0, -1).map(c => {
-        const el = c.querySelector('input,select,textarea');
-        return el ? el.value : '';
-      })
+      Array.from(r.cells).slice(0,-1).map(c => { const el = c.querySelector('input,select,textarea'); return el ? el.value : ''; })
     );
-
-    const checkboxValues = (gridSelector) =>
-      Array.from(document.querySelectorAll(`${gridSelector} input[type="checkbox"]:checked`)).map(c => c.value || c.closest('.checkbox-item').textContent.trim());
-
     const objectives = Array.from(document.querySelectorAll('#objectives-list input[type="text"]')).map(i => i.value).filter(Boolean);
     const keyMessages = Array.from(document.querySelectorAll('#messages-list textarea')).map(t => t.value).filter(Boolean);
-
     return {
       overview: {
         event_name: document.getElementById('event-name')?.value || '',
@@ -1192,7 +860,7 @@
       objectives,
       goals: tableRows('goals-body'),
       target_audience: {
-        segments: checkboxValues('#audience-grid'),
+        segments: Array.from(document.querySelectorAll('#audience-grid input[type="checkbox"]:checked')).map(c => c.value),
         notes: document.getElementById('audience-notes')?.value || '',
       },
       marketing_strategy: {
@@ -1214,7 +882,7 @@
     };
   }
 
-  // ── Upload all attached files to Supabase Storage ────────────────
+  // ── Upload files ─────────────────────────────────────────────────
   async function uploadAttachmentFiles(submissionId) {
     const rows = document.getElementById('attachments-body')?.rows || [];
     const uploaded = [];
@@ -1222,7 +890,7 @@
       const fileInput = rows[i].querySelector('input[type="file"]');
       if (fileInput && fileInput.files[0]) {
         const file = fileInput.files[0];
-        const path = `${submissionId}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+        const path = `${submissionId}/${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
         const { error } = await sb.storage.from('attachments').upload(path, file);
         if (!error) {
           const { data: urlData } = sb.storage.from('attachments').getPublicUrl(path);
@@ -1233,38 +901,39 @@
     return uploaded;
   }
 
+  // ── Activity log entry ───────────────────────────────────────────
+  function makeLogEntry(action) {
+    return { action, timestamp: new Date().toISOString() };
+  }
+
   // ── Save Draft ───────────────────────────────────────────────────
   async function saveDraft() {
     const btn = document.querySelector('.btn-ghost');
-    btn.textContent = 'Saving…';
-    btn.disabled = true;
-
+    btn.textContent = 'Saving…'; btn.disabled = true;
     const formData = collectFormData();
-    const eventName = formData.overview.event_name || 'Untitled Draft';
-    const shortName = formData.overview.short_name || '';
-
     try {
       const { error } = await sb.from('submissions').insert({
-        event_name: eventName,
-        short_name: shortName,
+        event_name: formData.overview.event_name || 'Untitled Draft',
+        short_name: formData.overview.short_name || '',
         form_data: formData,
         status: 'draft',
+        activity_log: [makeLogEntry('Draft saved')],
       });
       if (error) throw error;
       btn.textContent = 'Draft Saved ✓';
-    } catch (e) {
-      console.error(e);
-      btn.textContent = 'Save Failed';
+    } catch(e) {
+      console.error(e); btn.textContent = 'Save Failed';
     } finally {
       btn.disabled = false;
       setTimeout(() => btn.textContent = 'Save Draft', 2500);
     }
   }
 
-  // ── Submit Plan ──────────────────────────────────────────────────
+  // ── Submit / Resubmit ────────────────────────────────────────────
   async function submitPlan() {
-    const submitBtn = document.querySelector('.btn-submit');
-    submitBtn.textContent = 'Submitting…';
+    const submitBtn = document.getElementById('submit-btn');
+    const isResubmit = !!editingSubmissionId;
+    submitBtn.textContent = isResubmit ? 'Resubmitting…' : 'Submitting…';
     submitBtn.disabled = true;
 
     const formData = collectFormData();
@@ -1272,18 +941,34 @@
     const shortName = formData.overview.short_name || '';
 
     try {
-      // 1. Insert submission row
-      const { data, error } = await sb.from('submissions').insert({
-        event_name: eventName,
-        short_name: shortName,
-        form_data: formData,
-        status: 'pending',
-      }).select('id').single();
+      let submissionId;
 
-      if (error) throw error;
-      const submissionId = data.id;
+      if (isResubmit) {
+        // Update existing record
+        submissionId = editingSubmissionId;
+        const newLog = [...existingActivityLog, makeLogEntry('Resubmitted after revisions')];
+        const { error } = await sb.from('submissions').update({
+          event_name: eventName,
+          short_name: shortName,
+          form_data: formData,
+          status: 'pending',
+          activity_log: newLog,
+        }).eq('id', submissionId);
+        if (error) throw error;
+      } else {
+        // New submission
+        const { data, error } = await sb.from('submissions').insert({
+          event_name: eventName,
+          short_name: shortName,
+          form_data: formData,
+          status: 'pending',
+          activity_log: [makeLogEntry('Plan submitted')],
+        }).select('id').single();
+        if (error) throw error;
+        submissionId = data.id;
+      }
 
-      // 2. Upload files and attach their URLs
+      // Upload files
       const uploadedFiles = await uploadAttachmentFiles(submissionId);
       if (uploadedFiles.length > 0) {
         await sb.from('submissions').update({
@@ -1291,31 +976,37 @@
         }).eq('id', submissionId);
       }
 
-      // 3. Build review link using submission ID
-      const reviewLink = `${window.location.origin}/portal/review.html?review=${submissionId}`;
+      // Build review link
+      const base = window.location.origin + '/portal';
+      const reviewLink = `${base}/review.html?review=${submissionId}`;
 
-      // 4. Show success screen
+      // Show success
       document.getElementById('section-12').classList.remove('active');
       document.getElementById('nav-12').classList.remove('active');
       document.getElementById('nav-12').classList.add('complete');
+      document.getElementById('success-title').textContent = isResubmit ? 'Plan Resubmitted!' : 'Plan Submitted!';
+      document.getElementById('success-sub').textContent = isResubmit
+        ? 'Your updated plan has been resubmitted for review. The review link below stays the same.'
+        : 'Your communications plan has been submitted for review. Share the link below with your reviewer when ready.';
       document.getElementById('share-link').textContent = reviewLink;
       document.getElementById('success-screen').style.display = 'block';
       window.scrollTo({top: 0, behavior: 'smooth'});
 
-    } catch (e) {
+    } catch(e) {
       console.error('Submission error:', e);
-      alert('Something went wrong submitting the plan. Please try again.\n\n' + (e.message || e));
-      submitBtn.textContent = 'Submit for Review →';
+      alert('Something went wrong. Please try again.\n\n' + (e.message || e));
+      submitBtn.textContent = isResubmit ? 'Resubmit for Review →' : 'Submit for Review →';
       submitBtn.disabled = false;
     }
   }
 
-  // ── Copy link ────────────────────────────────────────────────────
   function copyLink() {
     navigator.clipboard.writeText(document.getElementById('share-link').textContent);
     document.querySelector('.copy-btn').textContent = 'Copied!';
     setTimeout(() => document.querySelector('.copy-btn').textContent = 'Copy', 2000);
   }
+
+  init();
 </script>
 </body>
 </html>
