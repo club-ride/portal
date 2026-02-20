@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plan Review — Club Ride</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  /* PDF export — hide UI chrome, show only plan content */
+  @media print {
+    .header, .sidebar, .comment-toggle, .section-comment-box,
+    .review-panel, .success-screen, .reviewed-banner,
+    .loading, .error-state, .pdf-btn { display: none !important; }
+    .layout { display: block !important; }
+    .main { padding: 0 !important; max-width: 100% !important; }
+    .plan-section { break-inside: avoid; border: none !important; padding: 16px 0 !important; border-bottom: 1px solid #eee !important; border-radius: 0 !important; }
+    body { background: white !important; }
+  }
 <style>
   :root {
     --cream: #F7F4EF;
@@ -52,6 +64,17 @@
     color: rgba(255,255,255,0.6); padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2);
     border-radius: 20px;
   }
+  .pdf-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 6px;
+    background: rgba(255,255,255,0.1); color: var(--white);
+    border: 1px solid rgba(255,255,255,0.25);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .pdf-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+  .pdf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
   .status-badge {
     font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
     padding: 5px 12px; border-radius: 20px;
@@ -226,8 +249,7 @@
   /* Review panel */
   .review-panel {
     background: var(--white); border: 1px solid var(--border); border-radius: 12px;
-    padding: 32px 36px; margin-top: 24px; position: bottom;
-    bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    padding: 32px 36px; margin-top: 24px;
   }
   .review-panel-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
   .review-panel-sub { font-size: 13px; color: var(--ink-light); margin-bottom: 20px; }
@@ -304,7 +326,12 @@
     <div class="header-divider"></div>
     <div class="header-badge">Communications Plan Review</div>
   </div>
-  <div id="header-status"></div>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <button class="pdf-btn" id="pdf-btn" onclick="exportPDF()" style="display:none">
+      ↓ Download PDF
+    </button>
+    <div id="header-status"></div>
+  </div>
 </header>
 
 <div class="layout" id="main-layout" style="display:none">
@@ -338,6 +365,8 @@
         <span id="reviewed-sub"></span>
       </div>
     </div>
+
+    <div id="pdf-content">
 
     <!-- Plan header -->
     <div class="plan-header">
@@ -606,6 +635,8 @@
       </div>
     </div>
 
+    </div><!-- /pdf-content -->
+
     <!-- Review Panel -->
     <div class="review-panel" id="s-review">
       <div class="review-panel-title">Your Response</div>
@@ -662,6 +693,41 @@
   let submissionData = null;
   let selectedDecision = null;
 
+  // ── Export PDF ───────────────────────────────────────────────────
+  async function exportPDF() {
+    const btn = document.getElementById('pdf-btn');
+    btn.textContent = 'Generating…';
+    btn.disabled = true;
+
+    const planName = submissionData?.event_name || 'Communications Plan';
+    const shortName = submissionData?.form_data?.overview?.short_name;
+    const filename = shortName
+      ? `${shortName}_CommsPlain.pdf`
+      : `${planName.replace(/\s+/g, '_')}_CommsPlan.pdf`;
+
+    // Build a clean print-only element
+    const content = document.getElementById('pdf-content');
+
+    const opt = {
+      margin:      [12, 14, 12, 14],
+      filename,
+      image:       { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF:       { unit: 'mm', format: 'letter', orientation: 'portrait' },
+      pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] },
+    };
+
+    try {
+      await html2pdf().set(opt).from(content).save();
+    } catch(e) {
+      console.error('PDF export error:', e);
+      alert('PDF generation failed. Please try again.');
+    }
+
+    btn.textContent = '↓ Download PDF';
+    btn.disabled = false;
+  }
+
   // ── Init ─────────────────────────────────────────────────────────
   async function init() {
     const params = new URLSearchParams(window.location.search);
@@ -686,6 +752,7 @@
       showReviewed(data);
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('main-layout').style.display = 'flex';
+      document.getElementById('pdf-btn').style.display = 'flex';
 
     } catch (e) {
       console.error(e);
