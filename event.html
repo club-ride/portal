@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Planning — Club Ride</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F4EF; --ink: #1A1A18; --ink-light: #5A5A56;
+    --accent: #1F417F; --accent-light: #EBF0F8; --border: #E0DAD0;
+    --white: #FFFFFF; --success: #8DAA43; --success-light: #F0F5E8;
+    --warn: #C8860A; --warn-light: #FDF4E3; --danger: #C0392B; --danger-light: #FDECEA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  /* ── Login ── */
+  .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--ink); }
+  .login-box { background: var(--white); border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 380px; text-align: center; }
+  .login-logo { height: 44px; width: auto; margin: 0 auto 28px; display: block; }
+  .login-title { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: var(--ink-light); margin-bottom: 28px; }
+  .login-input { width: 100%; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--ink); background: var(--cream); border: 1px solid var(--border); border-radius: 8px; outline: none; text-align: center; letter-spacing: 2px; margin-bottom: 14px; transition: border-color 0.15s; }
+  .login-input:focus { border-color: var(--accent); background: var(--white); }
+  .login-btn { width: 100%; padding: 13px; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .login-btn:hover { background: #17336a; }
+  .login-error { font-size: 13px; color: var(--danger); margin-top: 10px; display: none; }
+
+  /* ── Assignee view (no password) ── */
+  .assignee-banner { background: var(--accent); color: white; padding: 14px 48px; font-size: 13px; font-weight: 500; display: none; }
+
+  /* ── Header ── */
+  .header { background: var(--ink); color: var(--white); padding: 14px 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-logo { height: 38px; width: auto; }
+  .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+  .header-badge { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(255,255,255,0.6); padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; }
+  .header-right { display: flex; gap: 10px; align-items: center; }
+  .send-tasks-btn { padding: 8px 18px; background: var(--success); color: white; border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; display: none; }
+  .send-tasks-btn:hover { background: #7a943a; }
+  .send-tasks-btn:disabled { background: var(--border); color: var(--ink-light); cursor: not-allowed; }
+  .back-link { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; }
+  .back-link:hover { color: white; }
+
+  /* ── Layout ── */
+  .layout { display: flex; min-height: calc(100vh - 67px); }
+  .sidebar { width: 220px; flex-shrink: 0; background: var(--white); border-right: 1px solid var(--border); padding: 28px 0; position: sticky; top: 67px; height: calc(100vh - 67px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-light); padding: 0 20px 12px; }
+  .toc-item { display: block; padding: 8px 20px; font-size: 12px; color: var(--ink-light); cursor: pointer; transition: all 0.12s; border-left: 3px solid transparent; text-decoration: none; }
+  .toc-item:hover { background: var(--cream); color: var(--ink); }
+  .toc-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-light); font-weight: 500; }
+  .main { flex: 1; padding: 40px 48px; max-width: 960px; }
+
+  /* ── Plan header ── */
+  .plan-header { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin-bottom: 24px; }
+  .plan-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .plan-title { font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .plan-meta { display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--ink-light); }
+  .meta-item strong { color: var(--ink); display: block; font-size: 13px; margin-bottom: 1px; }
+
+  /* ── Progress bar ── */
+  .progress-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px 28px; margin-bottom: 24px; }
+  .progress-row { display: flex; align-items: center; gap: 16px; }
+  .progress-label { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; min-width: 120px; }
+  .progress-bar-wrap { flex: 1; background: var(--cream); border-radius: 20px; height: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 20px; background: var(--success); transition: width 0.4s ease; }
+  .progress-pct { font-size: 12px; font-weight: 600; color: var(--ink-light); white-space: nowrap; min-width: 36px; text-align: right; }
+
+  /* ── Sections ── */
+  .event-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px 32px; margin-bottom: 16px; scroll-margin-top: 90px; }
+  .section-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; }
+  .section-name { font-size: 17px; font-weight: 700; color: var(--ink); }
+  .section-count { font-size: 12px; color: var(--ink-light); }
+
+  /* ── Checklists ── */
+  .checklist-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 8px; transition: all 0.15s; cursor: pointer;
+    background: var(--white);
+  }
+  .checklist-item:hover { border-color: var(--accent); }
+  .checklist-item.done { background: var(--success-light); border-color: var(--success); opacity: 0.8; }
+  .check-box {
+    width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px;
+    flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; background: var(--white);
+  }
+  .checklist-item.done .check-box { background: var(--success); border-color: var(--success); color: white; font-size: 11px; }
+  .checklist-item:hover .check-box { border-color: var(--accent); }
+  .check-body { flex: 1; }
+  .check-name { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; }
+  .checklist-item.done .check-name { text-decoration: line-through; color: var(--ink-light); }
+  .check-meta { font-size: 12px; color: var(--ink-light); margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .check-tag { font-size: 11px; font-weight: 600; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 10px; }
+
+  /* ── Phase headers ── */
+  .phase-header { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink); margin: 18px 0 10px; }
+  .phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Assignee filter ── */
+  .assignee-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .assignee-chip {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    border: 1px solid var(--border); background: var(--white); color: var(--ink-light);
+    cursor: pointer; transition: all 0.12s;
+  }
+  .assignee-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .assignee-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* ── Send tasks modal ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+  .modal-header { padding: 24px 28px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-light); }
+  .modal-body { padding: 20px 28px 28px; }
+  .assignee-row { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .assignee-row:last-child { border-bottom: none; }
+  .assignee-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .assignee-task-count { font-size: 12px; color: var(--ink-light); margin-bottom: 8px; }
+  .email-input-row { display: flex; gap: 8px; }
+  .email-input-row input { flex: 1; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--cream); border: 1px solid var(--border); border-radius: 6px; outline: none; }
+  .email-input-row input:focus { border-color: var(--accent); background: white; }
+  .send-one-btn { padding: 8px 14px; background: var(--accent); color: white; border: none; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .send-one-btn:hover { background: #17336a; }
+  .send-one-btn:disabled { background: var(--border); color: var(--ink-light); cursor: not-allowed; }
+  .sent-badge { font-size: 11px; color: var(--success); font-weight: 600; padding-top: 4px; display: none; }
+
+  /* ── Reference tables ── */
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ref-table th { font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-light); padding: 0 12px 8px 0; text-align: left; border-bottom: 1px solid var(--border); }
+  .ref-table td { padding: 9px 12px 9px 0; color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .tag-pill { display: inline-block; background: var(--accent); color: white; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+  .attachment-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+  .attachment-link { font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .attachment-link:hover { text-decoration: underline; }
+
+  /* ── Loading / Error ── */
+  .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 14px; color: var(--ink-light); }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-state { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 12px; text-align: center; padding: 40px; }
+
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .main { padding: 20px; }
+    .header { padding: 12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <img src="assets/RTC_Club_Ride_LG_BLUE.png" alt="Club Ride" class="login-logo">
+    <div class="login-title">Event Planning</div>
+    <div class="login-sub">Enter your password to access this page.</div>
+    <input type="password" class="login-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    <button class="login-btn" onclick="login()">Sign In</button>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="app" style="display:none">
+
+  <!-- Assignee banner (shown when ?assignee= param present) -->
+  <div class="assignee-banner" id="assignee-banner"></div>
+
+  <header class="header">
+    <div class="header-left">
+      <img src="assets/RTC_Club_Ride_LG_WHT.png" alt="Club Ride" class="header-logo">
+      <div class="header-divider"></div>
+      <div class="header-badge">Event Planning</div>
+    </div>
+    <div class="header-right">
+      <button class="send-tasks-btn" id="send-tasks-btn" onclick="openSendModal()">✉ Send Task Lists</button>
+      <a href="dashboard.html" class="back-link">← Dashboard</a>
+    </div>
+  </header>
+
+  <div class="layout" id="main-layout">
+    <nav class="sidebar">
+      <div class="sidebar-label">Sections</div>
+      <a class="toc-item" onclick="scrollTo('s-progress')">Progress</a>
+      <a class="toc-item" onclick="scrollTo('s-specs')">Creative Specs</a>
+      <a class="toc-item" onclick="scrollTo('s-workback')">Workback Calendar</a>
+      <a class="toc-item" onclick="scrollTo('s-comms')">Comms Calendar</a>
+      <div class="sidebar-label" style="margin-top:16px">Reference</div>
+      <a class="toc-item" onclick="scrollTo('s-roles')">Roles</a>
+      <a class="toc-item" onclick="scrollTo('s-goals')">Goals</a>
+      <a class="toc-item" onclick="scrollTo('s-attachments')">Attachments</a>
+    </nav>
+
+    <main class="main">
+
+      <div class="loading" id="loading-state"><div class="spinner"></div><span>Loading event plan…</span></div>
+
+      <div id="content" style="display:none">
+
+        <!-- Plan header -->
+        <div class="plan-header">
+          <div class="plan-eyebrow">Event Planning</div>
+          <div class="plan-title" id="plan-title">Loading…</div>
+          <div class="plan-meta">
+            <div class="meta-item"><strong id="meta-date">—</strong>Event Date</div>
+            <div class="meta-item"><strong id="meta-time">—</strong>Time</div>
+            <div class="meta-item"><strong id="meta-location">—</strong>Location</div>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-section" id="s-progress">
+          <div class="section-label" style="margin-bottom:14px">Overall Progress</div>
+          <div class="progress-row" style="margin-bottom:12px">
+            <div class="progress-label">Creative Specs</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-specs" style="width:0%"></div></div>
+            <div class="progress-pct" id="pct-specs">0%</div>
+          </div>
+          <div class="progress-row" style="margin-bottom:12px">
+            <div class="progress-label">Approval Tasks</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-approval" style="width:0%"></div></div>
+            <div class="progress-pct" id="pct-approval">0%</div>
+          </div>
+          <div class="progress-row" style="margin-bottom:12px">
+            <div class="progress-label">Execution Tasks</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-execution" style="width:0%"></div></div>
+            <div class="progress-pct" id="pct-execution">0%</div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label">Post-Event Tasks</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-postevent" style="width:0%"></div></div>
+            <div class="progress-pct" id="pct-postevent">0%</div>
+          </div>
+        </div>
+
+        <!-- Creative Specs checklist -->
+        <div class="event-section" id="s-specs">
+          <div class="section-title-row">
+            <div>
+              <div class="section-label">Section 9</div>
+              <div class="section-name">Creative Specs</div>
+            </div>
+            <div class="section-count" id="specs-count"></div>
+          </div>
+          <div id="specs-list"></div>
+        </div>
+
+        <!-- Workback checklist -->
+        <div class="event-section" id="s-workback">
+          <div class="section-title-row">
+            <div>
+              <div class="section-label">Section 11</div>
+              <div class="section-name">Workback Calendar</div>
+            </div>
+            <div class="section-count" id="workback-count"></div>
+          </div>
+
+          <!-- Assignee filter -->
+          <div class="assignee-filter" id="assignee-filter"></div>
+
+          <div class="phase-header"><div class="phase-dot" style="background:#1F417F"></div>Phase 1 — Approval</div>
+          <div id="workback-approval-list"></div>
+
+          <div class="phase-header" style="margin-top:20px"><div class="phase-dot" style="background:#8DAA43"></div>Phase 2 — Execution</div>
+          <div id="workback-execution-list"></div>
+
+          <div class="phase-header" style="margin-top:20px"><div class="phase-dot" style="background:#5A5A56"></div>Phase 3 — Post-Event</div>
+          <div id="workback-postevent-list"></div>
+        </div>
+
+        <!-- Comms Calendar (reference) -->
+        <div class="event-section" id="s-comms">
+          <div class="section-title-row">
+            <div><div class="section-label">Section 12</div><div class="section-name">Communications Calendar</div></div>
+          </div>
+          <table class="ref-table">
+            <thead><tr><th>Publish Date</th><th>Channel</th><th>Content Detail</th><th>Owner</th></tr></thead>
+            <tbody id="comms-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Roles (reference) -->
+        <div class="event-section" id="s-roles">
+          <div class="section-title-row">
+            <div><div class="section-label">Reference</div><div class="section-name">Roles & Responsibilities</div></div>
+          </div>
+          <table class="ref-table">
+            <thead><tr><th>Name</th><th>Role</th><th>Team / Org</th><th>Responsibilities</th></tr></thead>
+            <tbody id="roles-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Goals (reference) -->
+        <div class="event-section" id="s-goals">
+          <div class="section-title-row">
+            <div><div class="section-label">Reference</div><div class="section-name">Goals</div></div>
+          </div>
+          <table class="ref-table">
+            <thead><tr><th>Goal</th><th>Target / Metric</th></tr></thead>
+            <tbody id="goals-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Attachments (reference) -->
+        <div class="event-section" id="s-attachments">
+          <div class="section-title-row">
+            <div><div class="section-label">Reference</div><div class="section-name">Attachments</div></div>
+          </div>
+          <div id="attachments-list"></div>
+        </div>
+
+      </div><!-- /content -->
+    </main>
+  </div>
+</div>
+
+<!-- Send Tasks Modal -->
+<div class="modal-overlay" id="send-modal" onclick="if(event.target===this) closeSendModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Send Task Lists</div>
+        <div class="modal-sub">Enter each assignee's email address and send their tasks.</div>
+      </div>
+      <button class="modal-close" onclick="closeSendModal()">×</button>
+    </div>
+    <div class="modal-body" id="send-modal-body"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL  = 'https://bcvwfthrqfzmfwzauhrl.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjdndmdGhycWZ6bWZ3emF1aHJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDE2MDMsImV4cCI6MjA4NzExNzYwM30.kC0SQw_6fev9V-KgJfuYaUdHrrlDUc7CLRfEPXig0eo';
+  const RESEND_API    = 're_g3Y49yJv_75gpukCVBWpcKfB6WBTo4TbH';
+  const PASSWORD      = 'paradise';
+  const BASE          = window.location.origin + '/portal';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let planId = null;
+  let planData = null;
+  let checkState = {}; // { 'specs-0': true, 'approval-1': false, ... }
+  let activeAssignee = 'all';
+  let isAssigneeView = false;
+  let assigneeFilter = null;
+
+  // ── Auth ──────────────────────────────────────────────────────────
+  function login() {
+    const val = document.getElementById('password-input').value;
+    if (val === PASSWORD) {
+      sessionStorage.setItem('cr_auth', '1');
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      initApp();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-input').focus();
+    }
+  }
+
+  function checkAuth() {
+    const params = new URLSearchParams(window.location.search);
+    planId = params.get('plan');
+    assigneeFilter = params.get('assignee'); // assignee name from email link
+
+    if (assigneeFilter) {
+      // Assignee view — no password needed
+      isAssigneeView = true;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      const banner = document.getElementById('assignee-banner');
+      banner.style.display = 'block';
+      banner.textContent = `👋 Hi ${assigneeFilter} — here are your assigned tasks. Check them off as you complete them.`;
+      initApp();
+    } else if (sessionStorage.getItem('cr_auth') === '1') {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      initApp();
+    }
+    // else: login screen stays visible
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────
+  async function initApp() {
+    if (!planId) {
+      document.getElementById('loading-state').innerHTML = '<div style="text-align:center;padding:60px;color:var(--ink-light)">No plan specified. <a href="dashboard.html" style="color:var(--accent)">Go to Dashboard →</a></div>';
+      return;
+    }
+
+    const { data, error } = await sb.from('submissions').select('*').eq('id', planId).single();
+    if (error || !data) {
+      document.getElementById('loading-state').innerHTML = '<div style="text-align:center;padding:60px;color:var(--ink-light)">Plan not found. <a href="dashboard.html" style="color:var(--accent)">Go to Dashboard →</a></div>';
+      return;
+    }
+
+    planData = data;
+    checkState = data.event_data || {};
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    if (!isAssigneeView) document.getElementById('send-tasks-btn').style.display = 'block';
+
+    renderPlan();
+  }
+
+  // ── Render ────────────────────────────────────────────────────────
+  function renderPlan() {
+    const fd = planData.form_data || {};
+    const ev = fd.event_details || {};
+    const ov = fd.overview || {};
+
+    document.title = `Event Planning — ${planData.event_name || 'Club Ride'}`;
+    document.getElementById('plan-title').textContent = planData.event_name || 'Untitled Plan';
+    document.getElementById('meta-date').textContent = ev.date ? formatDate(ev.date) : '—';
+    const time = [ev.start_time, ev.end_time].filter(Boolean).map(formatTime).join(' – ');
+    document.getElementById('meta-time').textContent = time || '—';
+    document.getElementById('meta-location').textContent = ev.location || '—';
+
+    renderSpecs(fd.creative_specs || []);
+    renderWorkback(fd.workback || {});
+    renderComms(fd.comms_calendar || []);
+    renderRoles(fd.roles || []);
+    renderGoals(fd.goals || []);
+    renderAttachments(fd.attachments || [], fd.uploaded_files || []);
+    updateProgress();
+  }
+
+  // ── Specs checklist ───────────────────────────────────────────────
+  function renderSpecs(specs) {
+    const list = document.getElementById('specs-list');
+    const validSpecs = specs.filter(r => r.some(c => c));
+    document.getElementById('specs-count').textContent = `${validSpecs.length} assets`;
+
+    if (!validSpecs.length) { list.innerHTML = '<p style="color:var(--ink-light);font-size:13px;font-style:italic">No creative specs listed.</p>'; return; }
+
+    list.innerHTML = validSpecs.map((r, i) => {
+      const key = `specs-${i}`;
+      const done = !!checkState[key];
+      return `<div class="checklist-item ${done?'done':''}" id="item-${key}" onclick="toggle('${key}')">
+        <div class="check-box">${done?'✓':''}</div>
+        <div class="check-body">
+          <div class="check-name">${r[0]||'Unnamed asset'}</div>
+          <div class="check-meta">
+            ${r[1]?`<span>${r[1]}</span>`:''}
+            ${r[2]?`<span class="check-tag">${r[2]}</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Workback checklist ────────────────────────────────────────────
+  function renderWorkback(wb) {
+    const phases = [
+      { key: 'approval', label: 'approval', listId: 'workback-approval-list', data: wb.approval || [] },
+      { key: 'execution', label: 'execution', listId: 'workback-execution-list', data: wb.execution || [] },
+      { key: 'post_event', label: 'postevent', listId: 'workback-postevent-list', data: wb.post_event || [] },
+    ];
+
+    // Collect all assignees
+    const assignees = new Set();
+    phases.forEach(ph => {
+      ph.data.forEach(r => { if (r[2] && r[2].trim()) assignees.add(r[2].trim()); });
+    });
+
+    // Render assignee filter chips
+    const filterEl = document.getElementById('assignee-filter');
+    if (assignees.size > 0) {
+      const all = [{ name: 'All', key: 'all' }, ...Array.from(assignees).map(n => ({ name: n, key: n }))];
+      filterEl.innerHTML = all.map(a =>
+        `<button class="assignee-chip ${(assigneeFilter ? assigneeFilter===a.key : a.key==='all')?'active':''}" onclick="filterByAssignee('${a.key}', this)">${a.name}</button>`
+      ).join('');
+      if (assigneeFilter) activeAssignee = assigneeFilter;
+    }
+
+    let totalTasks = 0;
+    phases.forEach(ph => {
+      const list = document.getElementById(`workback-${ph.label}-list`);
+      const validRows = ph.data.filter(r => r.some(c => c));
+      totalTasks += validRows.length;
+
+      if (!validRows.length) { list.innerHTML = '<p style="color:var(--ink-light);font-size:13px;font-style:italic;padding:8px 0">No tasks listed.</p>'; return; }
+
+      list.innerHTML = validRows.map((r, i) => {
+        const key = `${ph.label}-${i}`;
+        const done = !!checkState[key];
+        const owner = r[2] || '';
+        const deadline = r[1] ? formatDate(r[1]) : '';
+        const hidden = (activeAssignee !== 'all' && owner !== activeAssignee) || (assigneeFilter && owner !== assigneeFilter);
+        return `<div class="checklist-item ${done?'done':''} assignee-item" id="item-${key}" onclick="toggle('${key}')" data-owner="${owner}" style="${hidden?'display:none':''}">
+          <div class="check-box">${done?'✓':''}</div>
+          <div class="check-body">
+            <div class="check-name">${r[0]||'Unnamed task'}</div>
+            <div class="check-meta">
+              ${deadline?`<span>Due: <strong>${deadline}</strong></span>`:''}
+              ${owner?`<span class="check-tag">${owner}</span>`:''}
+              ${r[3]?`<span>${r[3]}</span>`:''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    });
+
+    document.getElementById('workback-count').textContent = `${totalTasks} tasks`;
+  }
+
+  function filterByAssignee(assignee, btn) {
+    activeAssignee = assignee;
+    document.querySelectorAll('.assignee-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.assignee-item').forEach(item => {
+      const owner = item.dataset.owner || '';
+      item.style.display = (assignee === 'all' || owner === assignee) ? '' : 'none';
+    });
+  }
+
+  // ── Comms calendar ────────────────────────────────────────────────
+  function renderComms(rows) {
+    const tbody = document.getElementById('comms-body');
+    const valid = rows.filter(r => r.some(c => c));
+    if (!valid.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-light);font-style:italic">No items listed.</td></tr>'; return; }
+    tbody.innerHTML = valid.map(r => `<tr>
+      <td>${r[0]?formatDate(r[0]):'—'}</td>
+      <td>${r[1]||'—'}</td>
+      <td>${r[2]||'—'}</td>
+      <td>${r[3]||'—'}</td>
+    </tr>`).join('');
+  }
+
+  // ── Roles ─────────────────────────────────────────────────────────
+  function renderRoles(rows) {
+    const tbody = document.getElementById('roles-body');
+    const valid = rows.filter(r => r.some(c => c));
+    if (!valid.length) { tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-light);font-style:italic">No roles listed.</td></tr>'; return; }
+    tbody.innerHTML = valid.map(r => `<tr>${r.map(c => `<td>${c||'—'}</td>`).join('')}</tr>`).join('');
+  }
+
+  // ── Goals ─────────────────────────────────────────────────────────
+  function renderGoals(rows) {
+    const tbody = document.getElementById('goals-body');
+    const valid = rows.filter(r => r.some(c => c));
+    if (!valid.length) { tbody.innerHTML = '<tr><td colspan="2" style="color:var(--ink-light);font-style:italic">No goals listed.</td></tr>'; return; }
+    tbody.innerHTML = valid.map(r => `<tr><td>${r[0]||'—'}</td><td>${r[1]||'—'}</td></tr>`).join('');
+  }
+
+  // ── Attachments ───────────────────────────────────────────────────
+  function renderAttachments(rows, uploaded) {
+    const el = document.getElementById('attachments-list');
+    const valid = rows.filter(r => r.some(c => c));
+    if (!valid.length) { el.innerHTML = '<p style="color:var(--ink-light);font-size:13px;font-style:italic">No attachments listed.</p>'; return; }
+    const icons = { Mockup:'🎨', Logo:'⭐', Photography:'📷', Video:'🎬', 'Copy / Script':'📝', 'Flyer / Print':'🗞️', Presentation:'📊', Spreadsheet:'📋' };
+    el.innerHTML = valid.map((r, i) => {
+      const name = r[0]||'Unnamed', type = r[1]||'', up = uploaded[i];
+      return `<div class="attachment-item">
+        <span>${icons[type]||'📎'}</span>
+        <span style="flex:1;font-weight:500">${name}</span>
+        <span style="font-size:11px;color:var(--ink-light)">${type}</span>
+        ${up ? `<a class="attachment-link" href="${up.url}" target="_blank">View ↗</a>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // ── Toggle checklist item ─────────────────────────────────────────
+  async function toggle(key) {
+    checkState[key] = !checkState[key];
+    const item = document.getElementById(`item-${key}`);
+    if (item) {
+      item.classList.toggle('done', checkState[key]);
+      const box = item.querySelector('.check-box');
+      if (box) box.textContent = checkState[key] ? '✓' : '';
+    }
+    updateProgress();
+    // Persist to Supabase
+    await sb.from('submissions').update({ event_data: checkState }).eq('id', planId);
+  }
+
+  // ── Progress bars ─────────────────────────────────────────────────
+  function updateProgress() {
+    const fd = planData.form_data || {};
+    const wb = fd.workback || {};
+    const specs = (fd.creative_specs||[]).filter(r=>r.some(c=>c));
+    const approval = (wb.approval||[]).filter(r=>r.some(c=>c));
+    const execution = (wb.execution||[]).filter(r=>r.some(c=>c));
+    const postevent = (wb.post_event||[]).filter(r=>r.some(c=>c));
+
+    const pct = (items, prefix) => {
+      if (!items.length) return 0;
+      const done = items.filter((_, i) => checkState[`${prefix}-${i}`]).length;
+      return Math.round((done / items.length) * 100);
+    };
+
+    const update = (barId, pctId, val) => {
+      document.getElementById(barId).style.width = val + '%';
+      document.getElementById(pctId).textContent = val + '%';
+    };
+
+    update('prog-specs', 'pct-specs', pct(specs, 'specs'));
+    update('prog-approval', 'pct-approval', pct(approval, 'approval'));
+    update('prog-execution', 'pct-execution', pct(execution, 'execution'));
+    update('prog-postevent', 'pct-postevent', pct(postevent, 'postevent'));
+  }
+
+  // ── Send tasks modal ──────────────────────────────────────────────
+  function openSendModal() {
+    const fd = planData.form_data || {};
+    const wb = fd.workback || {};
+    const allRows = [
+      ...(wb.approval||[]).map((r,i)=>({...rowToTask(r,'approval',i)})),
+      ...(wb.execution||[]).map((r,i)=>({...rowToTask(r,'execution',i)})),
+      ...(wb.post_event||[]).map((r,i)=>({...rowToTask(r,'postevent',i)})),
+    ].filter(t => t.name && t.owner);
+
+    // Group by owner
+    const byOwner = {};
+    allRows.forEach(t => {
+      if (!byOwner[t.owner]) byOwner[t.owner] = [];
+      byOwner[t.owner].push(t);
+    });
+
+    const body = document.getElementById('send-modal-body');
+    if (!Object.keys(byOwner).length) {
+      body.innerHTML = '<p style="color:var(--ink-light);font-size:13px">No tasks with assigned owners found. Add owner names to the Workback Calendar to send task lists.</p>';
+    } else {
+      body.innerHTML = Object.entries(byOwner).map(([owner, tasks]) => `
+        <div class="assignee-row">
+          <div class="assignee-name">${owner}</div>
+          <div class="assignee-task-count">${tasks.length} task${tasks.length!==1?'s':''} assigned</div>
+          <div class="email-input-row">
+            <input type="email" id="email-${slugify(owner)}" placeholder="${owner.split(' ')[0].toLowerCase()}@example.com">
+            <button class="send-one-btn" id="sendbtn-${slugify(owner)}" onclick="sendTaskEmail('${owner}', '${slugify(owner)}')">Send</button>
+          </div>
+          <div class="sent-badge" id="sent-${slugify(owner)}">✓ Email sent!</div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('send-modal').classList.add('open');
+  }
+
+  function closeSendModal() { document.getElementById('send-modal').classList.remove('open'); }
+
+  function rowToTask(r, phase, i) {
+    return { name: r[0]||'', deadline: r[1]||'', owner: r[2]||'', status: r[3]||'', phase, index: i };
+  }
+
+  function slugify(str) { return str.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,''); }
+
+  async function sendTaskEmail(owner, slug) {
+    const emailInput = document.getElementById(`email-${slug}`);
+    const email = emailInput.value.trim();
+    if (!email || !email.includes('@')) { emailInput.focus(); return; }
+
+    const btn = document.getElementById(`sendbtn-${slug}`);
+    btn.disabled = true; btn.textContent = 'Sending…';
+
+    const fd = planData.form_data || {};
+    const wb = fd.workback || {};
+    const allRows = [
+      ...(wb.approval||[]).map((r,i)=>({...rowToTask(r,'approval',i), phase_label:'Phase 1 — Approval'})),
+      ...(wb.execution||[]).map((r,i)=>({...rowToTask(r,'execution',i), phase_label:'Phase 2 — Execution'})),
+      ...(wb.post_event||[]).map((r,i)=>({...rowToTask(r,'postevent',i), phase_label:'Phase 3 — Post-Event'})),
+    ].filter(t => t.owner === owner && t.name);
+
+    const planName = planData.event_name || 'Communications Plan';
+    const eventDate = fd.event_details?.date ? formatDate(fd.event_details.date) : '—';
+    const taskLink = `${BASE}/event.html?plan=${planId}&assignee=${encodeURIComponent(owner)}`;
+
+    const taskRows = allRows.map(t =>
+      `<tr><td style="padding:8px 12px 8px 0;border-bottom:1px solid #eee;font-size:13px">${t.name}</td><td style="padding:8px 12px 8px 0;border-bottom:1px solid #eee;font-size:13px;color:#5A5A56">${t.deadline?formatDate(t.deadline):'—'}</td><td style="padding:8px 12px 8px 0;border-bottom:1px solid #eee;font-size:13px;color:#5A5A56">${t.phase_label}</td></tr>`
+    ).join('');
+
+    const html = `<div style="font-family:'DM Sans',sans-serif;max-width:560px;margin:0 auto;background:#ffffff">
+      <div style="background:#1A1A18;padding:20px 28px;border-radius:10px 10px 0 0">
+        <span style="font-size:18px;font-weight:700;color:#ffffff">Club<span style="color:#8DAA43">Ride</span></span>
+      </div>
+      <div style="padding:28px;border:1px solid #E0DAD0;border-top:none;border-radius:0 0 10px 10px">
+        <div style="font-size:20px;font-weight:700;color:#1A1A18;margin-bottom:6px">Hi ${owner.split(' ')[0]} 👋</div>
+        <div style="font-size:13px;color:#5A5A56;margin-bottom:20px">Here are your assigned tasks for <strong>${planName}</strong> (Event date: ${eventDate}).</div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            <th style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;padding:0 12px 8px 0;text-align:left;border-bottom:2px solid #E0DAD0">Task</th>
+            <th style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;padding:0 12px 8px 0;text-align:left;border-bottom:2px solid #E0DAD0">Deadline</th>
+            <th style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;padding:0 12px 8px 0;text-align:left;border-bottom:2px solid #E0DAD0">Phase</th>
+          </tr></thead>
+          <tbody>${taskRows}</tbody>
+        </table>
+        <div style="margin-top:24px">
+          <a href="${taskLink}" style="display:inline-block;background:#1F417F;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View & Check Off My Tasks →</a>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E0DAD0;font-size:11px;color:#5A5A56">Sent by the Club Ride communications plan portal.</div>
+      </div>
+    </div>`;
+
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${RESEND_API}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from:'Club Ride Portal <onboarding@resend.dev>', to:[email], subject:`Your tasks for ${planName}`, html }),
+      });
+      document.getElementById(`sent-${slug}`).style.display = 'block';
+      btn.textContent = '✓ Sent';
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'Send';
+      alert('Failed to send email. Please try again.');
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────
+  function formatDate(str) {
+    if (!str) return '—';
+    const d = new Date(str + (str.length===10?'T12:00:00':''));
+    return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  }
+  function formatTime(str) {
+    if (!str) return '';
+    const [h,m] = str.split(':'); const hr = parseInt(h);
+    return `${hr>12?hr-12:hr||12}:${m} ${hr>=12?'PM':'AM'}`;
+  }
+  function scrollTo(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  checkAuth();
+</script>
+</body>
+</html>
