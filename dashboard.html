@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Club Ride</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F4EF; --ink: #1A1A18; --ink-light: #5A5A56;
+    --accent: #1F417F; --accent-light: #EBF0F8; --border: #E0DAD0;
+    --white: #FFFFFF; --success: #8DAA43; --success-light: #F0F5E8;
+    --warn: #C8860A; --warn-light: #FDF4E3; --danger: #C0392B; --danger-light: #FDECEA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  /* ── Login screen ── */
+  .login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--ink);
+  }
+  .login-box {
+    background: var(--white); border-radius: 16px; padding: 48px 40px;
+    width: 100%; max-width: 380px; text-align: center;
+  }
+  .login-logo { height: 44px; width: auto; margin: 0 auto 28px; display: block; }
+  .login-title { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: var(--ink-light); margin-bottom: 28px; }
+  .login-input {
+    width: 100%; padding: 12px 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; color: var(--ink); background: var(--cream);
+    border: 1px solid var(--border); border-radius: 8px; outline: none;
+    text-align: center; letter-spacing: 2px; margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+  .login-input:focus { border-color: var(--accent); background: var(--white); }
+  .login-btn {
+    width: 100%; padding: 13px; background: var(--accent); color: white;
+    border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  .login-btn:hover { background: #17336a; }
+  .login-error { font-size: 13px; color: var(--danger); margin-top: 10px; display: none; }
+
+  /* ── Header ── */
+  .header {
+    background: var(--ink); color: var(--white); padding: 14px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-logo { height: 38px; width: auto; }
+  .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+  .header-title { font-size: 13px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; text-transform: uppercase; }
+  .new-plan-btn {
+    padding: 9px 20px; background: var(--accent); color: white; border: none;
+    border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+    font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block;
+    transition: background 0.15s;
+  }
+  .new-plan-btn:hover { background: #17336a; }
+
+  /* ── Page body ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 48px; }
+
+  /* ── Filters ── */
+  .filters { display: flex; gap: 8px; margin-bottom: 32px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--ink-light); margin-right: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-btn {
+    padding: 6px 16px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border);
+    background: var(--white); color: var(--ink-light); transition: all 0.12s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* ── Month groups ── */
+  .month-group { margin-bottom: 40px; }
+  .month-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--ink-light); margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+  }
+  .month-count {
+    background: var(--border); color: var(--ink-light); border-radius: 10px;
+    padding: 1px 8px; font-size: 10px; font-weight: 600;
+  }
+
+  /* ── Plan cards ── */
+  .plan-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 10px; display: flex; align-items: center;
+    gap: 20px; transition: box-shadow 0.15s; position: relative;
+  }
+  .plan-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .plan-card.archived { opacity: 0.5; }
+
+  .card-status { flex-shrink: 0; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-draft { background: var(--border); }
+  .dot-pending { background: var(--warn); }
+  .dot-approved { background: var(--success); }
+  .dot-revisions { background: var(--warn); }
+  .dot-denied { background: var(--danger); }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-short { font-size: 12px; color: var(--ink-light); }
+  .card-meta { display: flex; gap: 20px; margin-top: 8px; flex-wrap: wrap; }
+  .card-meta-item { font-size: 12px; color: var(--ink-light); }
+  .card-meta-item strong { color: var(--ink); font-weight: 500; }
+
+  .card-badge {
+    flex-shrink: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .badge-draft { background: var(--cream); color: var(--ink-light); border: 1px solid var(--border); }
+  .badge-pending { background: var(--warn-light); color: var(--warn); }
+  .badge-approved { background: var(--success-light); color: var(--success); }
+  .badge-revisions { background: var(--warn-light); color: var(--warn); }
+  .badge-denied { background: var(--danger-light); color: var(--danger); }
+
+  .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .card-btn {
+    padding: 7px 14px; border-radius: 6px; font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none;
+    display: inline-block; transition: all 0.12s; border: 1px solid var(--border);
+    background: var(--white); color: var(--ink-light);
+  }
+  .card-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .card-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .card-btn.primary:hover { background: #17336a; }
+  .card-btn.danger { color: var(--danger); }
+  .card-btn.danger:hover { border-color: var(--danger); background: var(--danger-light); color: var(--danger); }
+  .card-btn.restore { color: var(--success); }
+  .card-btn.restore:hover { border-color: var(--success); background: var(--success-light); }
+
+  /* ── Log modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 1000; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white); border-radius: 16px; width: 100%; max-width: 560px;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    padding: 24px 28px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--white); z-index: 1;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .modal-sub { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+  .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink-light); padding: 4px; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 20px 28px 28px; }
+  .log-entry { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .log-entry:last-child { border-bottom: none; }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .log-body-m { flex: 1; }
+  .log-action { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .log-action.approved { color: var(--success); }
+  .log-action.revisions { color: var(--warn); }
+  .log-action.denied { color: var(--danger); }
+  .log-meta { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+  .log-comment { font-size: 13px; color: var(--ink); margin-top: 6px; padding: 8px 12px; background: var(--cream); border-radius: 6px; line-height: 1.5; }
+  .log-empty { font-size: 13px; color: var(--ink-light); font-style: italic; padding: 16px 0; }
+
+  /* ── Empty state ── */
+  .empty-state { text-align: center; padding: 80px 40px; color: var(--ink-light); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; line-height: 1.6; }
+
+  /* ── Loading ── */
+  .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 14px; color: var(--ink-light); }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Show archived toggle ── */
+  .show-archived-wrap { margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .toggle-label { font-size: 12px; color: var(--ink-light); cursor: pointer; user-select: none; }
+  .toggle-cb { accent-color: var(--accent); cursor: pointer; }
+
+  @media (max-width: 700px) {
+    .page { padding: 20px; }
+    .header { padding: 12px 20px; }
+    .card-meta { gap: 10px; }
+    .card-actions { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <img src="assets/RTC_Club_Ride_LG_BLUE.png" alt="Club Ride" class="login-logo">
+    <div class="login-title">Team Dashboard</div>
+    <div class="login-sub">Enter your password to access the dashboard.</div>
+    <input type="password" class="login-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    <button class="login-btn" onclick="login()">Sign In</button>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" style="display:none">
+  <header class="header">
+    <div class="header-left">
+      <img src="assets/RTC_Club_Ride_LG_WHT.png" alt="Club Ride" class="header-logo">
+      <div class="header-divider"></div>
+      <div class="header-title">Plans Dashboard</div>
+    </div>
+    <a href="index.html" class="new-plan-btn">+ New Plan</a>
+  </header>
+
+  <div class="page">
+
+    <!-- Filters -->
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('draft', this)">Draft</button>
+      <button class="filter-btn" onclick="setFilter('pending', this)">Pending Review</button>
+      <button class="filter-btn" onclick="setFilter('approved', this)">Approved</button>
+      <button class="filter-btn" onclick="setFilter('revisions', this)">Revisions Requested</button>
+      <button class="filter-btn" onclick="setFilter('denied', this)">Denied</button>
+    </div>
+
+    <!-- Show archived -->
+    <div class="show-archived-wrap">
+      <input type="checkbox" class="toggle-cb" id="show-archived" onchange="renderPlans()">
+      <label class="toggle-label" for="show-archived">Show archived plans</label>
+    </div>
+
+    <!-- Plans list -->
+    <div id="plans-container">
+      <div class="loading"><div class="spinner"></div><span>Loading plans…</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Activity Log Modal -->
+<div class="modal-overlay" id="log-modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-plan-name">Activity Log</div>
+        <div class="modal-sub" id="modal-plan-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-log-body"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL  = 'https://bcvwfthrqfzmfwzauhrl.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjdndmdGhycWZ6bWZ3emF1aHJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDE2MDMsImV4cCI6MjA4NzExNzYwM30.kC0SQw_6fev9V-KgJfuYaUdHrrlDUc7CLRfEPXig0eo';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  const PASSWORD = 'paradise';
+  const BASE = window.location.origin + '/portal';
+
+  let allPlans = [];
+  let activeFilter = 'all';
+
+  // ── Auth ──────────────────────────────────────────────────────────
+  function login() {
+    const val = document.getElementById('password-input').value;
+    if (val === PASSWORD) {
+      sessionStorage.setItem('cr_auth', '1');
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadPlans();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('password-input').value = '';
+      document.getElementById('password-input').focus();
+    }
+  }
+
+  function checkAuth() {
+    if (sessionStorage.getItem('cr_auth') === '1') {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadPlans();
+    }
+  }
+
+  // ── Load plans ────────────────────────────────────────────────────
+  async function loadPlans() {
+    const { data, error } = await sb.from('submissions').select('*').order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+    allPlans = data || [];
+    renderPlans();
+  }
+
+  // ── Filter ────────────────────────────────────────────────────────
+  function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderPlans();
+  }
+
+  // ── Render ────────────────────────────────────────────────────────
+  function renderPlans() {
+    const showArchived = document.getElementById('show-archived').checked;
+    let plans = allPlans.filter(p => {
+      if (!showArchived && p.archived) return false;
+      if (activeFilter === 'all') return true;
+      return p.status === activeFilter;
+    });
+
+    const container = document.getElementById('plans-container');
+
+    if (!plans.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No plans found</div><div class="empty-sub">No communications plans match your current filter.</div></div>`;
+      return;
+    }
+
+    // Group by event month
+    const groups = {};
+    plans.forEach(p => {
+      const eventDate = p.form_data?.event_details?.date;
+      const key = eventDate ? getMonthKey(eventDate) : 'No Event Date';
+      const sortKey = eventDate ? eventDate : '9999-99';
+      if (!groups[key]) groups[key] = { sortKey, label: eventDate ? getMonthLabel(eventDate) : 'No Event Date', plans: [] };
+      groups[key].plans.push(p);
+    });
+
+    // Sort groups by event month ascending
+    const sortedGroups = Object.values(groups).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+    container.innerHTML = sortedGroups.map(group => `
+      <div class="month-group">
+        <div class="month-label">
+          ${group.label}
+          <span class="month-count">${group.plans.length}</span>
+        </div>
+        ${group.plans.map(p => renderCard(p)).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderCard(p) {
+    const status = p.status || 'draft';
+    const badgeMap = { draft:'badge-draft', pending:'badge-pending', approved:'badge-approved', revisions:'badge-revisions', denied:'badge-denied' };
+    const dotMap = { draft:'dot-draft', pending:'dot-pending', approved:'dot-approved', revisions:'dot-revisions', denied:'dot-denied' };
+    const labelMap = { draft:'Draft', pending:'Pending Review', approved:'Approved', revisions:'Revisions Requested', denied:'Denied' };
+    const eventDate = p.form_data?.event_details?.date;
+    const submittedDate = p.created_at ? formatDate(p.created_at.split('T')[0]) : '—';
+    const reviewer = p.reviewer_name || '';
+    const log = p.activity_log || [];
+    const isArchived = !!p.archived;
+
+    const reviewUrl = `${BASE}/review.html?review=${p.id}`;
+    const resubmitUrl = `${BASE}/index.html?resubmit=${p.id}`;
+    const eventUrl = `${BASE}/event.html?plan=${p.id}`;
+
+    return `<div class="plan-card${isArchived?' archived':''}" id="card-${p.id}">
+      <div class="card-status"><div class="status-dot ${dotMap[status]||'dot-draft'}"></div></div>
+      <div class="card-body">
+        <div class="card-name">${p.event_name || 'Untitled Plan'}</div>
+        ${p.short_name ? `<div class="card-short">${p.short_name}</div>` : ''}
+        <div class="card-meta">
+          <div class="card-meta-item">Event: <strong>${eventDate ? formatDate(eventDate) : '—'}</strong></div>
+          <div class="card-meta-item">Submitted: <strong>${submittedDate}</strong></div>
+          ${reviewer ? `<div class="card-meta-item">Last reviewer: <strong>${reviewer}</strong></div>` : ''}
+          ${log.length ? `<div class="card-meta-item">Activity: <strong>${log.length} entry${log.length!==1?'s':''}</strong></div>` : ''}
+        </div>
+      </div>
+      <div class="card-badge ${badgeMap[status]||'badge-draft'}">${labelMap[status]||status}</div>
+      <div class="card-actions">
+        <a href="${reviewUrl}" target="_blank" class="card-btn primary">View Plan</a>
+        ${status === 'approved' ? `<a href="${eventUrl}" target="_blank" class="card-btn">Event Page</a>` : ''}
+        ${status === 'revisions' ? `<a href="${resubmitUrl}" target="_blank" class="card-btn">Revise</a>` : ''}
+        <button class="card-btn" onclick="openLog('${p.id}')">Log ${log.length?`(${log.length})`:'(0)'}</button>
+        ${isArchived
+          ? `<button class="card-btn restore" onclick="archivePlan('${p.id}', false)">Restore</button>`
+          : `<button class="card-btn danger" onclick="archivePlan('${p.id}', true)">Archive</button>`
+        }
+      </div>
+    </div>`;
+  }
+
+  // ── Archive ───────────────────────────────────────────────────────
+  async function archivePlan(id, archive) {
+    const { error } = await sb.from('submissions').update({ archived: archive }).eq('id', id);
+    if (error) { alert('Failed to update plan. Please try again.'); return; }
+    const plan = allPlans.find(p => p.id === id);
+    if (plan) plan.archived = archive;
+    renderPlans();
+  }
+
+  // ── Activity log modal ────────────────────────────────────────────
+  function openLog(id) {
+    const plan = allPlans.find(p => p.id === id);
+    if (!plan) return;
+    const log = plan.activity_log || [];
+    document.getElementById('modal-plan-name').textContent = plan.event_name || 'Untitled Plan';
+    document.getElementById('modal-plan-sub').textContent = plan.short_name || '';
+    const body = document.getElementById('modal-log-body');
+
+    if (!log.length) {
+      body.innerHTML = '<div class="log-empty">No activity recorded yet.</div>';
+    } else {
+      body.innerHTML = log.map(entry => {
+        const decisionLabel = { approved:'✓ Approved', revisions:'↩ Revisions Requested', denied:'✕ Denied' }[entry.decision] || '';
+        const actionText = `${entry.action}${decisionLabel ? ' — ' + decisionLabel : ''}`;
+        const decisionClass = entry.decision ? entry.decision : '';
+        return `<div class="log-entry">
+          <div class="log-dot"></div>
+          <div class="log-body-m">
+            <div class="log-action ${decisionClass}">${actionText}</div>
+            <div class="log-meta">${entry.reviewer_name ? `<strong>${entry.reviewer_name}</strong> · ` : ''}${formatDate(entry.timestamp?.split('T')[0])} at ${formatTimestamp(entry.timestamp)}</div>
+            ${entry.overall_comment ? `<div class="log-comment">${entry.overall_comment}</div>` : ''}
+            ${entry.section_comments ? Object.entries(entry.section_comments).map(([k,v]) => `<div class="log-comment"><strong style="font-size:11px;text-transform:uppercase;color:var(--ink-light)">${k}</strong><br>${v}</div>`).join('') : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('log-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('log-modal').classList.remove('open');
+  }
+
+  // ── Date helpers ──────────────────────────────────────────────────
+  function getMonthKey(dateStr) {
+    if (!dateStr) return '9999-99';
+    const d = new Date(dateStr + 'T12:00:00');
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  function getMonthLabel(dateStr) {
+    if (!dateStr) return 'No Event Date';
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
+  function formatDate(str) {
+    if (!str) return '—';
+    const d = new Date(str + (str.length===10?'T12:00:00':''));
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function formatTimestamp(ts) {
+    if (!ts) return '';
+    return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+
+  checkAuth();
+</script>
+</body>
+</html>
