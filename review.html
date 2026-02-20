@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Review — Club Ride</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F4EF;
+    --ink: #1A1A18;
+    --ink-light: #5A5A56;
+    --accent: #1F417F;
+    --accent-light: #EBF0F8;
+    --border: #E0DAD0;
+    --white: #FFFFFF;
+    --success: #8DAA43;
+    --success-light: #F0F5E8;
+    --warn: #C8860A;
+    --warn-light: #FDF4E3;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: var(--ink);
+    color: var(--white);
+    padding: 22px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); }
+  .logo span { color: #8DAA43; }
+  .header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+  .header-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+  }
+  .status-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 20px;
+  }
+  .status-pending { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+  .status-approved { background: var(--success); color: white; }
+  .status-revisions { background: var(--warn); color: white; }
+  .status-denied { background: var(--danger); color: white; }
+
+  /* Loading */
+  .loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 60vh; gap: 16px; color: var(--ink-light);
+  }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error */
+  .error-state {
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 60vh; gap: 12px; text-align: center; padding: 40px;
+  }
+  .error-icon { font-size: 48px; }
+  .error-title { font-size: 22px; font-weight: 700; color: var(--ink); }
+  .error-sub { font-size: 14px; color: var(--ink-light); max-width: 400px; line-height: 1.6; }
+
+  /* Layout */
+  .layout { display: flex; min-height: calc(100vh - 65px); }
+
+  /* TOC Sidebar */
+  .sidebar {
+    width: 220px; flex-shrink: 0; background: var(--white);
+    border-right: 1px solid var(--border); padding: 28px 0;
+    position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto;
+  }
+  .sidebar-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--ink-light); padding: 0 20px 12px;
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 20px; font-size: 12px; color: var(--ink-light);
+    cursor: pointer; transition: all 0.12s; border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+  .toc-item:hover { background: var(--cream); color: var(--ink); }
+  .toc-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-light); font-weight: 500; }
+
+  /* Main */
+  .main { flex: 1; padding: 40px 48px; max-width: 900px; }
+
+  /* Plan header */
+  .plan-header {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 32px 36px; margin-bottom: 24px;
+  }
+  .plan-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .plan-title { font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .plan-sub { font-size: 13px; color: var(--ink-light); }
+  .plan-meta {
+    display: flex; gap: 24px; margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .meta-item { font-size: 12px; color: var(--ink-light); }
+  .meta-item strong { color: var(--ink); display: block; font-size: 13px; margin-bottom: 2px; }
+
+  /* Section blocks */
+  .plan-section {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 16px; scroll-margin-top: 90px;
+  }
+  .section-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 3px;
+  }
+  .section-name { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .comment-toggle {
+    font-size: 12px; font-weight: 500; color: var(--accent);
+    background: var(--accent-light); border: 1px solid var(--accent);
+    border-radius: 6px; padding: 5px 12px; cursor: pointer;
+    transition: all 0.12s; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .comment-toggle:hover { background: var(--accent); color: white; }
+  .comment-toggle.has-comment { background: var(--accent); color: white; }
+
+  /* Section comment box */
+  .section-comment-box {
+    display: none; margin-top: 16px; padding: 16px;
+    background: var(--accent-light); border: 1px solid var(--accent);
+    border-radius: 8px; animation: fadeIn 0.2s ease;
+  }
+  .section-comment-box.open { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .section-comment-box label { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.3px; margin-bottom: 6px; display: block; }
+  .section-comment-box textarea {
+    width: 100%; padding: 10px 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--ink); background: var(--white);
+    border: 1px solid var(--border); border-radius: 6px; outline: none;
+    resize: vertical; min-height: 80px; line-height: 1.6;
+    transition: border-color 0.15s;
+  }
+  .section-comment-box textarea:focus { border-color: var(--accent); }
+
+  /* Data display */
+  .field-pair { margin-bottom: 14px; }
+  .field-label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
+  .field-value { font-size: 14px; color: var(--ink); line-height: 1.6; }
+  .field-value.empty { color: var(--ink-light); font-style: italic; }
+  .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 14px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 14px; }
+
+  /* Tags */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tag {
+    background: var(--accent); color: white; border-radius: 4px;
+    padding: 3px 10px; font-size: 12px; font-weight: 500;
+  }
+
+  /* Tables */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--ink-light); padding: 0 12px 10px 0; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 10px 12px 10px 0; color: var(--ink); border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--cream); }
+
+  /* Phase headers */
+  .phase-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; color: var(--ink);
+    margin: 20px 0 10px; letter-spacing: 0.2px;
+  }
+  .phase-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Status pill in tables */
+  .status-pill {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill-complete { background: var(--success-light); color: var(--success); }
+  .pill-progress { background: var(--warn-light); color: var(--warn); }
+  .pill-blocked { background: var(--danger-light); color: var(--danger); }
+  .pill-default { background: var(--cream); color: var(--ink-light); }
+
+  /* Attachments */
+  .attachment-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--cream); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px; font-size: 13px;
+  }
+  .attachment-icon { font-size: 18px; }
+  .attachment-name { flex: 1; font-weight: 500; }
+  .attachment-type { font-size: 11px; color: var(--ink-light); }
+  .attachment-link { font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .attachment-link:hover { text-decoration: underline; }
+
+  /* Review panel */
+  .review-panel {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 32px 36px; margin-top: 24px; position: sticky;
+    bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+  .review-panel-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .review-panel-sub { font-size: 13px; color: var(--ink-light); margin-bottom: 20px; }
+
+  .decision-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .decision-btn {
+    flex: 1; min-width: 120px; padding: 14px 16px; border-radius: 10px;
+    border: 2px solid var(--border); background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+    color: var(--ink-light);
+  }
+  .decision-btn:hover { border-color: var(--ink-light); color: var(--ink); }
+  .decision-btn.selected-approve { border-color: var(--success); background: var(--success-light); color: var(--success); }
+  .decision-btn.selected-revisions { border-color: var(--warn); background: var(--warn-light); color: var(--warn); }
+  .decision-btn.selected-deny { border-color: var(--danger); background: var(--danger-light); color: var(--danger); }
+
+  .overall-comment { margin-bottom: 20px; }
+  .overall-comment label { font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.3px; display: block; margin-bottom: 6px; }
+  .overall-comment textarea {
+    width: 100%; padding: 12px 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--ink); background: var(--cream);
+    border: 1px solid var(--border); border-radius: 8px; outline: none;
+    resize: vertical; min-height: 100px; line-height: 1.6;
+    transition: border-color 0.15s;
+  }
+  .overall-comment textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31,65,127,0.1); background: var(--white); }
+
+  .submit-review-btn {
+    width: 100%; padding: 14px; background: var(--accent); color: white;
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .submit-review-btn:hover { background: #17336a; }
+  .submit-review-btn:disabled { background: var(--border); color: var(--ink-light); cursor: not-allowed; }
+
+  /* Already reviewed banner */
+  .reviewed-banner {
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 24px;
+    display: none; align-items: center; gap: 14px;
+  }
+  .reviewed-banner.approved { background: var(--success-light); border: 1px solid var(--success); }
+  .reviewed-banner.revisions { background: var(--warn-light); border: 1px solid var(--warn); }
+  .reviewed-banner.denied { background: var(--danger-light); border: 1px solid var(--danger); }
+  .reviewed-banner-icon { font-size: 28px; }
+  .reviewed-banner-text strong { font-size: 15px; font-weight: 700; display: block; margin-bottom: 2px; }
+  .reviewed-banner-text span { font-size: 13px; color: var(--ink-light); }
+
+  /* Success overlay */
+  .success-screen {
+    display: none; text-align: center; padding: 80px 40px;
+  }
+  .success-icon { font-size: 52px; margin-bottom: 16px; }
+  .success-title { font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .success-sub { font-size: 14px; color: var(--ink-light); line-height: 1.7; max-width: 400px; margin: 0 auto; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* Responsive */
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .main { padding: 24px; }
+    .field-row-2, .field-row-3 { grid-template-columns: 1fr; }
+    .header { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">Club<span>Ride</span></div>
+    <div class="header-divider"></div>
+    <div class="header-badge">Communications Plan Review</div>
+  </div>
+  <div id="header-status"></div>
+</header>
+
+<div class="layout" id="main-layout" style="display:none">
+
+  <!-- TOC Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Sections</div>
+    <a class="toc-item" onclick="scrollTo('s-overview')">Overview</a>
+    <a class="toc-item" onclick="scrollTo('s-details')">Event Details</a>
+    <a class="toc-item" onclick="scrollTo('s-roles')">Roles & Responsibilities</a>
+    <a class="toc-item" onclick="scrollTo('s-objectives')">Objectives</a>
+    <a class="toc-item" onclick="scrollTo('s-goals')">Goals</a>
+    <a class="toc-item" onclick="scrollTo('s-audience')">Target Audience</a>
+    <a class="toc-item" onclick="scrollTo('s-strategy')">Marketing Strategy</a>
+    <a class="toc-item" onclick="scrollTo('s-tactics')">Tactics</a>
+    <a class="toc-item" onclick="scrollTo('s-specs')">Creative Specs</a>
+    <a class="toc-item" onclick="scrollTo('s-attachments')">Attachments</a>
+    <a class="toc-item" onclick="scrollTo('s-workback')">Workback Calendar</a>
+    <a class="toc-item" onclick="scrollTo('s-comms')">Comms Calendar</a>
+    <a class="toc-item" onclick="scrollTo('s-review')" style="margin-top:12px; font-weight:600; color:var(--accent);">↓ Your Response</a>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Already reviewed banner -->
+    <div class="reviewed-banner" id="reviewed-banner">
+      <div class="reviewed-banner-icon" id="reviewed-icon"></div>
+      <div class="reviewed-banner-text">
+        <strong id="reviewed-title"></strong>
+        <span id="reviewed-sub"></span>
+      </div>
+    </div>
+
+    <!-- Plan header -->
+    <div class="plan-header">
+      <div class="plan-eyebrow">Communications Plan</div>
+      <div class="plan-title" id="plan-title">Loading…</div>
+      <div class="plan-sub" id="plan-short-name"></div>
+      <div class="plan-meta">
+        <div class="meta-item"><strong id="meta-date">—</strong>Event Date</div>
+        <div class="meta-item"><strong id="meta-time">—</strong>Event Time</div>
+        <div class="meta-item"><strong id="meta-location">—</strong>Location</div>
+        <div class="meta-item"><strong id="meta-submitted">—</strong>Submitted</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <div class="plan-section" id="s-overview">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 1</div>
+          <div class="section-name">Overview</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-overview', this)">+ Add Comment</button>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Overview</div>
+        <div class="field-value" id="f-overview"></div>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Theme / Central Message</div>
+        <div class="field-value" id="f-theme"></div>
+      </div>
+      <div class="section-comment-box" id="c-overview">
+        <label>Comment on Overview</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 2: Event Details -->
+    <div class="plan-section" id="s-details">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 2</div>
+          <div class="section-name">Key Event Details</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-details', this)">+ Add Comment</button>
+      </div>
+      <div class="field-row-3">
+        <div class="field-pair"><div class="field-label">Date</div><div class="field-value" id="f-date"></div></div>
+        <div class="field-pair"><div class="field-label">Time</div><div class="field-value" id="f-time"></div></div>
+        <div class="field-pair"><div class="field-label">Location</div><div class="field-value" id="f-location"></div></div>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Additional Notes</div>
+        <div class="field-value" id="f-event-notes"></div>
+      </div>
+      <div class="section-comment-box" id="c-details">
+        <label>Comment on Key Event Details</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 3: Roles -->
+    <div class="plan-section" id="s-roles">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 3</div>
+          <div class="section-name">Roles & Responsibilities</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-roles', this)">+ Add Comment</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Role</th><th>Team / Org</th><th>Responsibilities</th></tr></thead>
+        <tbody id="f-roles"></tbody>
+      </table>
+      <div class="section-comment-box" id="c-roles">
+        <label>Comment on Roles & Responsibilities</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 4: Objectives -->
+    <div class="plan-section" id="s-objectives">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 4</div>
+          <div class="section-name">Objectives</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-objectives', this)">+ Add Comment</button>
+      </div>
+      <div id="f-objectives"></div>
+      <div class="section-comment-box" id="c-objectives">
+        <label>Comment on Objectives</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 5: Goals -->
+    <div class="plan-section" id="s-goals">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 5</div>
+          <div class="section-name">Goals</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-goals', this)">+ Add Comment</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Goal</th><th>Target / Metric</th></tr></thead>
+        <tbody id="f-goals"></tbody>
+      </table>
+      <div class="section-comment-box" id="c-goals">
+        <label>Comment on Goals</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 6: Target Audience -->
+    <div class="plan-section" id="s-audience">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 6</div>
+          <div class="section-name">Target Audience</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-audience', this)">+ Add Comment</button>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Audience Segments</div>
+        <div class="tag-list" id="f-audience"></div>
+      </div>
+      <div class="field-pair" style="margin-top:14px">
+        <div class="field-label">Notes</div>
+        <div class="field-value" id="f-audience-notes"></div>
+      </div>
+      <div class="section-comment-box" id="c-audience">
+        <label>Comment on Target Audience</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 7: Marketing Strategy -->
+    <div class="plan-section" id="s-strategy">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 7</div>
+          <div class="section-name">Marketing Strategy</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-strategy', this)">+ Add Comment</button>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Key Messages</div>
+        <div id="f-messages"></div>
+      </div>
+      <div class="field-pair" style="margin-top:14px">
+        <div class="field-label">Strategic Notes</div>
+        <div class="field-value" id="f-strategy-notes"></div>
+      </div>
+      <div class="section-comment-box" id="c-strategy">
+        <label>Comment on Marketing Strategy</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 8: Tactics -->
+    <div class="plan-section" id="s-tactics">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 8</div>
+          <div class="section-name">Tactics</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-tactics', this)">+ Add Comment</button>
+      </div>
+      <div class="field-pair">
+        <div class="field-label">Channels</div>
+        <div class="tag-list" id="f-tactics"></div>
+      </div>
+      <div class="field-pair" style="margin-top:14px">
+        <div class="field-label">Notes</div>
+        <div class="field-value" id="f-tactics-notes"></div>
+      </div>
+      <div class="section-comment-box" id="c-tactics">
+        <label>Comment on Tactics</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 9: Creative Specs -->
+    <div class="plan-section" id="s-specs">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 9</div>
+          <div class="section-name">Creative Specs</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-specs', this)">+ Add Comment</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Asset Type</th><th>Dimensions / Specs</th><th>Format</th></tr></thead>
+        <tbody id="f-specs"></tbody>
+      </table>
+      <div class="section-comment-box" id="c-specs">
+        <label>Comment on Creative Specs</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 10: Attachments -->
+    <div class="plan-section" id="s-attachments">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 10</div>
+          <div class="section-name">Attachments</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-attachments', this)">+ Add Comment</button>
+      </div>
+      <div id="f-attachments"></div>
+      <div class="section-comment-box" id="c-attachments">
+        <label>Comment on Attachments</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 11: Workback Calendar -->
+    <div class="plan-section" id="s-workback">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 11</div>
+          <div class="section-name">Workback Calendar</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-workback', this)">+ Add Comment</button>
+      </div>
+      <div class="phase-header"><div class="phase-dot" style="background:#1F417F"></div>Phase 1 — Approval</div>
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Deadline</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody id="f-workback-approval"></tbody>
+      </table>
+      <div class="phase-header" style="margin-top:20px"><div class="phase-dot" style="background:#8DAA43"></div>Phase 2 — Execution</div>
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Deadline</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody id="f-workback-execution"></tbody>
+      </table>
+      <div class="phase-header" style="margin-top:20px"><div class="phase-dot" style="background:#5A5A56"></div>Phase 3 — Post-Event</div>
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Deadline</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody id="f-workback-postevent"></tbody>
+      </table>
+      <div class="section-comment-box" id="c-workback">
+        <label>Comment on Workback Calendar</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Section 12: Comms Calendar -->
+    <div class="plan-section" id="s-comms">
+      <div class="section-title-row">
+        <div>
+          <div class="section-label">Section 12</div>
+          <div class="section-name">Communications Calendar</div>
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('c-comms', this)">+ Add Comment</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Publish Date</th><th>Channel</th><th>Content Detail</th><th>Owner</th></tr></thead>
+        <tbody id="f-comms"></tbody>
+      </table>
+      <div class="section-comment-box" id="c-comms">
+        <label>Comment on Communications Calendar</label>
+        <textarea placeholder="Leave a comment on this section…"></textarea>
+      </div>
+    </div>
+
+    <!-- Review Panel -->
+    <div class="review-panel" id="s-review">
+      <div class="review-panel-title">Your Response</div>
+      <div class="review-panel-sub">Select a decision and optionally leave an overall comment before submitting. You can also add comments on individual sections above.</div>
+
+      <div class="decision-buttons">
+        <button class="decision-btn" id="btn-approve" onclick="selectDecision('approved')">✓ Approve</button>
+        <button class="decision-btn" id="btn-revisions" onclick="selectDecision('revisions')">↩ Request Revisions</button>
+        <button class="decision-btn" id="btn-deny" onclick="selectDecision('denied')">✕ Deny</button>
+      </div>
+
+      <div class="overall-comment">
+        <label>Overall Comments <span style="font-weight:400; color:var(--ink-light)">(optional)</span></label>
+        <textarea id="overall-comment" placeholder="Any overall feedback, notes, or context for the Club Ride team…"></textarea>
+      </div>
+
+      <button class="submit-review-btn" id="submit-review-btn" onclick="submitReview()">Submit Response</button>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon" id="success-icon"></div>
+      <div class="success-title" id="success-title"></div>
+      <div class="success-sub" id="success-sub"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Loading state -->
+<div class="loading" id="loading-state">
+  <div class="spinner"></div>
+  <span>Loading communications plan…</span>
+</div>
+
+<!-- Error state -->
+<div class="error-state" id="error-state">
+  <div class="error-icon">🔍</div>
+  <div class="error-title">Plan not found</div>
+  <div class="error-sub">This review link may be invalid or expired. Please contact the Club Ride team for a new link.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── Config ───────────────────────────────────────────────────────
+  const SUPABASE_URL  = 'https://bcvwfthrqfzmfwzauhrl.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjdndmdGhycWZ6bWZ3emF1aHJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NDE2MDMsImV4cCI6MjA4NzExNzYwM30.kC0SQw_6fev9V-KgJfuYaUdHrrlDUc7CLRfEPXig0eo';
+  const RESEND_API    = 're_g3Y49yJv_75gpukCVBWpcKfB6WBTo4TbH';
+  const NOTIFY_EMAIL  = 'picazos@rtcsnv.com';
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let submissionId = null;
+  let submissionData = null;
+  let selectedDecision = null;
+
+  // ── Init ─────────────────────────────────────────────────────────
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    submissionId = params.get('review');
+
+    if (!submissionId) {
+      showError();
+      return;
+    }
+
+    try {
+      const { data, error } = await sb
+        .from('submissions')
+        .select('*')
+        .eq('id', submissionId)
+        .single();
+
+      if (error || !data) { showError(); return; }
+
+      submissionData = data;
+      renderPlan(data);
+      showReviewed(data);
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('main-layout').style.display = 'flex';
+
+    } catch (e) {
+      console.error(e);
+      showError();
+    }
+  }
+
+  function showError() {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('error-state').style.display = 'flex';
+  }
+
+  // ── Render plan data ─────────────────────────────────────────────
+  function val(v, fallback = '—') {
+    return (v && v.toString().trim()) ? v : `<span class="empty">${fallback}</span>`;
+  }
+
+  function renderPlan(data) {
+    const fd = data.form_data || {};
+    const ov = fd.overview || {};
+    const ev = fd.event_details || {};
+    const ma = fd.marketing_strategy || {};
+    const ta = fd.target_audience || {};
+    const tc = fd.tactics || {};
+
+    // Header
+    document.getElementById('plan-title').textContent = ov.event_name || 'Untitled Plan';
+    document.getElementById('plan-short-name').textContent = ov.short_name ? `Short name: ${ov.short_name}` : '';
+    document.title = `Review — ${ov.event_name || 'Communications Plan'}`;
+
+    // Meta
+    document.getElementById('meta-date').innerHTML = val(ev.date ? formatDate(ev.date) : '');
+    const time = [ev.start_time, ev.end_time].filter(Boolean).map(formatTime).join(' – ');
+    document.getElementById('meta-time').innerHTML = val(time);
+    document.getElementById('meta-location').innerHTML = val(ev.location);
+    document.getElementById('meta-submitted').innerHTML = val(formatDate(data.created_at?.split('T')[0]));
+
+    // Status badge
+    const statusMap = {
+      pending: ['status-pending', 'Awaiting Review'],
+      draft:   ['status-pending', 'Draft'],
+      approved:  ['status-approved', 'Approved'],
+      revisions: ['status-revisions', 'Revisions Requested'],
+      denied:    ['status-denied', 'Denied'],
+    };
+    const [cls, label] = statusMap[data.status] || statusMap.pending;
+    document.getElementById('header-status').innerHTML = `<span class="status-badge ${cls}">${label}</span>`;
+
+    // Section 1
+    document.getElementById('f-overview').innerHTML = val(ov.overview);
+    document.getElementById('f-theme').innerHTML = val(ov.theme);
+
+    // Section 2
+    document.getElementById('f-date').innerHTML = val(ev.date ? formatDate(ev.date) : '');
+    document.getElementById('f-time').innerHTML = val(time);
+    document.getElementById('f-location').innerHTML = val(ev.location);
+    document.getElementById('f-event-notes').innerHTML = val(ev.notes);
+
+    // Section 3 — Roles
+    const rolesTbody = document.getElementById('f-roles');
+    (fd.roles || []).forEach(r => {
+      if (r.some(c => c)) rolesTbody.insertAdjacentHTML('beforeend',
+        `<tr>${r.map(c => `<td>${val(c)}</td>`).join('')}</tr>`);
+    });
+    if (!rolesTbody.children.length) rolesTbody.innerHTML = '<tr><td colspan="4" class="empty" style="color:var(--ink-light);font-style:italic">No roles listed</td></tr>';
+
+    // Section 4 — Objectives
+    const objEl = document.getElementById('f-objectives');
+    (fd.objectives || []).forEach((o, i) => {
+      if (o) objEl.insertAdjacentHTML('beforeend',
+        `<div style="display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.5">
+          <span style="color:var(--accent);font-weight:600;flex-shrink:0">${i+1}.</span>
+          <span>${o}</span>
+        </div>`);
+    });
+    if (!objEl.children.length) objEl.innerHTML = '<span class="field-value empty">No objectives listed</span>';
+
+    // Section 5 — Goals
+    const goalsTbody = document.getElementById('f-goals');
+    (fd.goals || []).forEach(r => {
+      if (r.some(c => c)) goalsTbody.insertAdjacentHTML('beforeend',
+        `<tr>${r.map(c => `<td>${val(c)}</td>`).join('')}</tr>`);
+    });
+    if (!goalsTbody.children.length) goalsTbody.innerHTML = '<tr><td colspan="2" class="empty" style="color:var(--ink-light);font-style:italic">No goals listed</td></tr>';
+
+    // Section 6 — Audience
+    const audEl = document.getElementById('f-audience');
+    (ta.segments || []).forEach(s => {
+      audEl.insertAdjacentHTML('beforeend', `<span class="tag">${s}</span>`);
+    });
+    if (!audEl.children.length) audEl.innerHTML = '<span style="color:var(--ink-light);font-style:italic;font-size:13px">None selected</span>';
+    document.getElementById('f-audience-notes').innerHTML = val(ta.notes);
+
+    // Section 7 — Strategy
+    const msgEl = document.getElementById('f-messages');
+    (ma.key_messages || []).forEach((m, i) => {
+      if (m) msgEl.insertAdjacentHTML('beforeend',
+        `<div style="display:flex;gap:10px;margin-bottom:10px;padding:12px 14px;background:var(--cream);border-radius:8px;font-size:13px;line-height:1.6">
+          <span style="color:var(--accent);font-weight:700;flex-shrink:0">${i+1}.</span>
+          <span>${m}</span>
+        </div>`);
+    });
+    if (!msgEl.children.length) msgEl.innerHTML = '<span class="field-value empty">No key messages listed</span>';
+    document.getElementById('f-strategy-notes').innerHTML = val(ma.notes);
+
+    // Section 8 — Tactics
+    const tacEl = document.getElementById('f-tactics');
+    (tc.channels || []).forEach(c => {
+      tacEl.insertAdjacentHTML('beforeend', `<span class="tag">${c}</span>`);
+    });
+    if (!tacEl.children.length) tacEl.innerHTML = '<span style="color:var(--ink-light);font-style:italic;font-size:13px">None selected</span>';
+    document.getElementById('f-tactics-notes').innerHTML = val(tc.notes);
+
+    // Section 9 — Specs
+    const specsTbody = document.getElementById('f-specs');
+    (fd.creative_specs || []).forEach(r => {
+      if (r.some(c => c)) specsTbody.insertAdjacentHTML('beforeend',
+        `<tr>${r.map(c => `<td>${val(c)}</td>`).join('')}</tr>`);
+    });
+    if (!specsTbody.children.length) specsTbody.innerHTML = '<tr><td colspan="3" class="empty" style="color:var(--ink-light);font-style:italic">No specs listed</td></tr>';
+
+    // Section 10 — Attachments
+    const attEl = document.getElementById('f-attachments');
+    const uploadedFiles = fd.uploaded_files || [];
+    const attRows = fd.attachments || [];
+
+    if (!attRows.length && !uploadedFiles.length) {
+      attEl.innerHTML = '<span class="field-value empty">No attachments listed</span>';
+    } else {
+      attRows.forEach((r, i) => {
+        const name = r[0] || 'Unnamed';
+        const type = r[1] || '';
+        const uploaded = uploadedFiles[i];
+        const icons = { Mockup:'🎨', Logo:'⭐', Photography:'📷', Video:'🎬', 'Copy / Script':'📝', 'Flyer / Print':'🗞️', Presentation:'📊', Spreadsheet:'📋' };
+        attEl.insertAdjacentHTML('beforeend',
+          `<div class="attachment-item">
+            <span class="attachment-icon">${icons[type] || '📎'}</span>
+            <span class="attachment-name">${name}</span>
+            <span class="attachment-type">${type}</span>
+            ${uploaded ? `<a class="attachment-link" href="${uploaded.url}" target="_blank">View ↗</a>` : ''}
+          </div>`);
+      });
+    }
+
+    // Section 11 — Workback
+    const wb = fd.workback || {};
+    renderWorkbackPhase('f-workback-approval', wb.approval || []);
+    renderWorkbackPhase('f-workback-execution', wb.execution || []);
+    renderWorkbackPhase('f-workback-postevent', wb.post_event || []);
+
+    // Section 12 — Comms Calendar
+    const commsTbody = document.getElementById('f-comms');
+    (fd.comms_calendar || []).forEach(r => {
+      if (r.some(c => c)) commsTbody.insertAdjacentHTML('beforeend',
+        `<tr>
+          <td>${r[0] ? formatDate(r[0]) : '—'}</td>
+          <td>${val(r[1])}</td>
+          <td>${val(r[2])}</td>
+          <td>${val(r[3])}</td>
+        </tr>`);
+    });
+    if (!commsTbody.children.length) commsTbody.innerHTML = '<tr><td colspan="4" class="empty" style="color:var(--ink-light);font-style:italic">No items listed</td></tr>';
+  }
+
+  function renderWorkbackPhase(tbodyId, rows) {
+    const tbody = document.getElementById(tbodyId);
+    rows.forEach(r => {
+      if (r.some(c => c)) {
+        const statusMap = { Complete: 'pill-complete', 'In Progress': 'pill-progress', Blocked: 'pill-blocked' };
+        const pillClass = statusMap[r[3]] || 'pill-default';
+        tbody.insertAdjacentHTML('beforeend',
+          `<tr>
+            <td>${val(r[0])}</td>
+            <td>${r[1] ? formatDate(r[1]) : '—'}</td>
+            <td>${val(r[2])}</td>
+            <td><span class="status-pill ${pillClass}">${r[3] || '—'}</span></td>
+          </tr>`);
+      }
+    });
+    if (!tbody.children.length) tbody.innerHTML = '<tr><td colspan="4" style="color:var(--ink-light);font-style:italic;font-size:13px;padding:10px 0">No tasks listed</td></tr>';
+  }
+
+  // ── Show already-reviewed banner ─────────────────────────────────
+  function showReviewed(data) {
+    if (!['approved','revisions','denied'].includes(data.status)) return;
+    const banner = document.getElementById('reviewed-banner');
+    const map = {
+      approved:  { cls: 'approved', icon: '✅', title: 'This plan has been approved.', sub: 'You submitted your approval. The Club Ride team has been notified.' },
+      revisions: { cls: 'revisions', icon: '↩️', title: 'Revisions were requested.', sub: 'You requested revisions. The Club Ride team has been notified.' },
+      denied:    { cls: 'denied', icon: '❌', title: 'This plan was denied.', sub: 'You denied this plan. The Club Ride team has been notified.' },
+    };
+    const m = map[data.status];
+    banner.className = `reviewed-banner ${m.cls}`;
+    document.getElementById('reviewed-icon').textContent = m.icon;
+    document.getElementById('reviewed-title').textContent = m.title;
+    document.getElementById('reviewed-sub').textContent = m.sub;
+    banner.style.display = 'flex';
+
+    // Lock review panel
+    document.getElementById('submit-review-btn').disabled = true;
+    document.getElementById('submit-review-btn').textContent = 'Response already submitted';
+    document.querySelectorAll('.decision-btn').forEach(b => b.disabled = true);
+    document.getElementById('overall-comment').disabled = true;
+  }
+
+  // ── Decision selection ───────────────────────────────────────────
+  function selectDecision(d) {
+    selectedDecision = d;
+    document.getElementById('btn-approve').className = 'decision-btn' + (d === 'approved' ? ' selected-approve' : '');
+    document.getElementById('btn-revisions').className = 'decision-btn' + (d === 'revisions' ? ' selected-revisions' : '');
+    document.getElementById('btn-deny').className = 'decision-btn' + (d === 'denied' ? ' selected-deny' : '');
+  }
+
+  // ── Section comments ─────────────────────────────────────────────
+  function toggleComment(id, btn) {
+    const box = document.getElementById(id);
+    box.classList.toggle('open');
+    const isOpen = box.classList.contains('open');
+    btn.textContent = isOpen ? '− Remove Comment' : '+ Add Comment';
+    btn.classList.toggle('has-comment', isOpen);
+    if (isOpen) box.querySelector('textarea').focus();
+  }
+
+  function collectSectionComments() {
+    const sections = ['overview','details','roles','objectives','goals','audience','strategy','tactics','specs','attachments','workback','comms'];
+    const comments = {};
+    sections.forEach(s => {
+      const box = document.getElementById(`c-${s}`);
+      if (box && box.classList.contains('open')) {
+        const val = box.querySelector('textarea').value.trim();
+        if (val) comments[s] = val;
+      }
+    });
+    return comments;
+  }
+
+  // ── Submit review ────────────────────────────────────────────────
+  async function submitReview() {
+    if (!selectedDecision) {
+      alert('Please select a decision — Approve, Request Revisions, or Deny — before submitting.');
+      return;
+    }
+
+    const btn = document.getElementById('submit-review-btn');
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
+
+    const overallComment = document.getElementById('overall-comment').value.trim();
+    const sectionComments = collectSectionComments();
+
+    try {
+      // Update submission in Supabase
+      const { error } = await sb.from('submissions').update({
+        status: selectedDecision,
+        review_data: {
+          decision: selectedDecision,
+          overall_comment: overallComment,
+          section_comments: sectionComments,
+          reviewed_at: new Date().toISOString(),
+        }
+      }).eq('id', submissionId);
+
+      if (error) throw error;
+
+      // Send email notification via Resend
+      await sendNotificationEmail(selectedDecision, overallComment, sectionComments);
+
+      // Show success
+      showSuccess(selectedDecision);
+
+    } catch (e) {
+      console.error('Review submission error:', e);
+      alert('Something went wrong. Please try again.\n\n' + (e.message || e));
+      btn.textContent = 'Submit Response';
+      btn.disabled = false;
+    }
+  }
+
+  // ── Send email via Resend ────────────────────────────────────────
+  async function sendNotificationEmail(decision, overallComment, sectionComments) {
+    const decisionLabels = {
+      approved:  '✅ Approved',
+      revisions: '↩ Revisions Requested',
+      denied:    '❌ Denied',
+    };
+    const decisionLabel = decisionLabels[decision] || decision;
+    const planName = submissionData?.event_name || 'Communications Plan';
+    const reviewUrl = window.location.href;
+
+    const sectionNames = {
+      overview: 'Overview', details: 'Key Event Details', roles: 'Roles & Responsibilities',
+      objectives: 'Objectives', goals: 'Goals', audience: 'Target Audience',
+      strategy: 'Marketing Strategy', tactics: 'Tactics', specs: 'Creative Specs',
+      attachments: 'Attachments', workback: 'Workback Calendar', comms: 'Comms Calendar',
+    };
+
+    let sectionCommentsHtml = '';
+    Object.entries(sectionComments).forEach(([key, comment]) => {
+      sectionCommentsHtml += `
+        <div style="margin-bottom:12px;padding:12px 16px;background:#f5f5f3;border-left:3px solid #1F417F;border-radius:0 6px 6px 0">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;margin-bottom:4px">${sectionNames[key] || key}</div>
+          <div style="font-size:14px;color:#1A1A18;line-height:1.6">${comment}</div>
+        </div>`;
+    });
+
+    const html = `
+      <div style="font-family:'DM Sans',sans-serif;max-width:600px;margin:0 auto;background:#ffffff">
+        <div style="background:#1A1A18;padding:24px 32px;border-radius:10px 10px 0 0">
+          <span style="font-size:20px;font-weight:700;color:#ffffff">Club<span style="color:#8DAA43">Ride</span></span>
+          <span style="margin-left:12px;font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px">Plan Review Update</span>
+        </div>
+        <div style="padding:32px;border:1px solid #E0DAD0;border-top:none;border-radius:0 0 10px 10px">
+          <div style="font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:8px">${decisionLabel}</div>
+          <div style="font-size:14px;color:#5A5A56;margin-bottom:24px">A reviewer has responded to the following communications plan.</div>
+
+          <div style="background:#F7F4EF;border-radius:8px;padding:16px 20px;margin-bottom:24px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;margin-bottom:4px">Plan</div>
+            <div style="font-size:16px;font-weight:600;color:#1A1A18">${planName}</div>
+          </div>
+
+          ${overallComment ? `
+          <div style="margin-bottom:24px">
+            <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;margin-bottom:8px">Overall Comment</div>
+            <div style="font-size:14px;color:#1A1A18;line-height:1.7;padding:14px 16px;background:#F7F4EF;border-radius:8px">${overallComment}</div>
+          </div>` : ''}
+
+          ${sectionCommentsHtml ? `
+          <div style="margin-bottom:24px">
+            <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#5A5A56;margin-bottom:10px">Section Comments</div>
+            ${sectionCommentsHtml}
+          </div>` : ''}
+
+          <a href="${reviewUrl}" style="display:inline-block;background:#1F417F;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View Full Plan →</a>
+
+          <div style="margin-top:28px;padding-top:20px;border-top:1px solid #E0DAD0;font-size:12px;color:#5A5A56">
+            This notification was sent automatically by the Club Ride communications plan portal.
+          </div>
+        </div>
+      </div>`;
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Club Ride Portal <onboarding@resend.dev>',
+        to: [NOTIFY_EMAIL],
+        subject: `[${decisionLabel}] ${planName} — Review Response`,
+        html,
+      }),
+    });
+  }
+
+  // ── Show success ─────────────────────────────────────────────────
+  function showSuccess(decision) {
+    document.getElementById('s-review').style.display = 'none';
+    const map = {
+      approved:  { icon: '✅', title: 'Plan Approved', sub: 'Your approval has been recorded and the Club Ride team has been notified.' },
+      revisions: { icon: '↩️', title: 'Revisions Requested', sub: 'Your feedback has been recorded and the Club Ride team has been notified.' },
+      denied:    { icon: '❌', title: 'Plan Denied', sub: 'Your response has been recorded and the Club Ride team has been notified.' },
+    };
+    const m = map[decision];
+    document.getElementById('success-icon').textContent = m.icon;
+    document.getElementById('success-title').textContent = m.title;
+    document.getElementById('success-sub').textContent = m.sub;
+    document.getElementById('success-screen').style.display = 'block';
+
+    const statusMap = { approved: ['status-approved','Approved'], revisions: ['status-revisions','Revisions Requested'], denied: ['status-denied','Denied'] };
+    const [cls, label] = statusMap[decision];
+    document.getElementById('header-status').innerHTML = `<span class="status-badge ${cls}">${label}</span>`;
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  // ── Scroll to section ────────────────────────────────────────────
+  function scrollTo(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────
+  function formatDate(str) {
+    if (!str) return '';
+    const d = new Date(str + (str.length === 10 ? 'T12:00:00' : ''));
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+  function formatTime(str) {
+    if (!str) return '';
+    const [h, m] = str.split(':');
+    const hr = parseInt(h);
+    return `${hr > 12 ? hr - 12 : hr || 12}:${m} ${hr >= 12 ? 'PM' : 'AM'}`;
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
